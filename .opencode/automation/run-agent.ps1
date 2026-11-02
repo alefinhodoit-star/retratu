@@ -1,11 +1,12 @@
 ﻿# Executa um agente OpenCode de cada vez, em rotação: ui-ux -> perf -> security.
 #
 # Por execução:
-#   1. Backup de src/, index.html, vite.config.js, jsconfig.json e package.json
+#   1. Checkpoint git (se o repositório existir) + backup local em backups/
 #   2. `opencode run --agent <id> --auto` com o prompt de prompts/<id>.md
 #   3. `npm run build`
-#   4. Se o build falhar, restaura o backup e registra a reversão
-#   5. Avança o estado da rotação
+#   4. Se o build falhar: git reset --hard para o checkpoint (e restauro do backup como 2.ª rede)
+#   5. Se o build passar: commit automático com prefixo auto(<agente>)
+#   6. Avança o estado da rotação
 #
 # Uso:
 #   .\run-agent.ps1            executa o próximo agente da rotação
@@ -71,12 +72,38 @@ if (-not (Test-Path $promptPath)) {
 }
 
 if ($DryRun) {
-    Escrever-Log "DRY RUN: nenhum agente executado, estado inalterado."
+    Escrever-Log 'DRY RUN: nenhum agente executado, estado inalterado.'
     Escrever-Log "Prompt que seria usado: $promptPath"
     exit 0
 }
 
-# ------------------------------------------------------------------ backup ---
+$gitDisponivel = Test-Path (Join-Path $Root '.git')
+Escrever-Log "Repositório git: $(if ($gitDisponivel) { 'sim' } else { 'não' })"
+
+# --------------------------------------------------------------- checkpoint ---
+$checkpoint = $null
+if ($gitDisponivel) {
+    Push-Location $Root
+    try {
+        git add -A 2>&1 | Out-Null
+        $pendente = (git status --porcelain 2>&1 | Out-String).Trim()
+        if ($pendente) {
+            git commit -q -m "chore(automacao): checkpoint antes de $agenteId" 2>&1 | Out-Null
+            Escrever-Log 'Trabalho pendente guardado num commit de checkpoint.'
+        }
+        $checkpoint = (git rev-parse HEAD 2>&1 | Out-String).Trim()
+        Escrever-Log "Checkpoint git: $checkpoint"
+    }
+    catch {
+        Escrever-Log "AVISO: checkpoint git falhou — $($_.Exception.Message)"
+        $checkpoint = $null
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+# ------------------------------------------------------------------- backup ---
 $backupPath = Join-Path $BackupDir $stamp
 New-Item -ItemType Directory -Path $backupPath -Force | Out-Null
 
@@ -118,26 +145,41 @@ if (-not (Test-Path $OpenCode)) {
     exit 1
 }
 
-Escrever-Log "A executar: opencode run --agent $agenteId --auto (limite $TimeoutSegundos s)"
+$outFile = Join-Path $LogDir "$stamp-$agenteId.out.txt"
+$errFile = Join-Path $LogDir "$stamp-$agenteId.err.txt"
 
 # O prompt vai como ficheiro anexado: evita passar texto multilinha por cmd.exe.
-$job = Start-Job -ScriptBlock {
-    param($exe, $id, $prompt, $wd)
-    Set-Location $wd
-    & $exe run --agent $id --auto --title "Automacao $id" --file $prompt 'Segue as instrucoes do ficheiro anexado e aplica-as.'
-} -ArgumentList $OpenCode, $agenteId, $promptPath, $Root
+$argumentos = 'run --agent ' + $agenteId +
+    ' --auto --title "Automacao ' + $agenteId + '"' +
+    ' --file "' + $promptPath + '"' +
+    ' "Segue as instrucoes do ficheiro anexado e aplica-as."'
 
-$concluiu = Wait-Job $job -Timeout $TimeoutSegundos
-if ($concluiu) {
-    $saida = Receive-Job $job | Out-String
-}
-else {
-    Stop-Job $job -ErrorAction SilentlyContinue
-    $saida = "TIMEOUT: o agente excedeu $TimeoutSegundos segundos e foi interrompido."
-}
-Remove-Job $job -Force -ErrorAction SilentlyContinue
+Escrever-Log "A executar: opencode run --agent $agenteId --auto (limite $TimeoutSegundos s)"
 
-Add-Content -Path $logPath -Value $saida -Encoding utf8
+$codigoSaida = -1
+try {
+    $proc = Start-Process -FilePath $OpenCode -ArgumentList $argumentos -NoNewWindow -PassThru `
+        -RedirectStandardOutput $outFile -RedirectStandardError $errFile
+    $terminou = $proc.WaitForExit($TimeoutSegundos * 1000)
+    if ($terminou) {
+        $codigoSaida = $proc.ExitCode
+        Escrever-Log "Agente terminou com código $codigoSaida."
+    }
+    else {
+        $proc.Kill()
+        Escrever-Log "TIMEOUT: o agente excedeu $TimeoutSegundos segundos e foi interrompido."
+    }
+}
+catch {
+    Escrever-Log "ERRO ao executar o agente: $($_.Exception.Message)"
+}
+
+foreach ($f in @($outFile, $errFile)) {
+    if (Test-Path $f) {
+        $conteudo = Get-Content $f -Raw -Encoding utf8 -ErrorAction SilentlyContinue
+        if ($conteudo) { Add-Content -Path $logPath -Value $conteudo -Encoding utf8 }
+    }
+}
 
 # ----------------------------------------------------------- verificação -----
 $buildOk = $false
@@ -158,10 +200,52 @@ if ($buildOk) {
     Escrever-Log 'Build OK — alterações mantidas.'
 }
 else {
-    Escrever-Log "Build FALHOU — a restaurar o backup $stamp."
+    Escrever-Log 'Build FALHOU — a reverter.'
     Add-Content -Path $logPath -Value $buildSaida -Encoding utf8
-    Restaurar-Backup
-    Escrever-Log 'Backup restaurado. O projeto volta ao estado anterior.'
+
+    if ($gitDisponivel -and $checkpoint) {
+        Push-Location $Root
+        try {
+            git reset --hard $checkpoint 2>&1 | Out-Null
+            git clean -fd -- src 2>&1 | Out-Null
+            Escrever-Log "git reset --hard $checkpoint concluído."
+        }
+        catch {
+            Escrever-Log "AVISO: reset git falhou — $($_.Exception.Message). A usar o backup local."
+            Restaurar-Backup
+        }
+        finally {
+            Pop-Location
+        }
+    }
+    else {
+        Restaurar-Backup
+        Escrever-Log 'Backup local restaurado.'
+    }
+}
+
+# ------------------------------------------------------------- commit final ---
+$commitFeito = $false
+if ($gitDisponivel -and $buildOk) {
+    Push-Location $Root
+    try {
+        git add -A 2>&1 | Out-Null
+        $alterado = (git status --porcelain 2>&1 | Out-String).Trim()
+        if ($alterado) {
+            git commit -q -m "auto($agenteId): melhorias automaticas" 2>&1 | Out-Null
+            $commitFeito = $true
+            Escrever-Log 'Commit automático criado.'
+        }
+        else {
+            Escrever-Log 'Sem alterações para commitar.'
+        }
+    }
+    catch {
+        Escrever-Log "AVISO: commit automático falhou — $($_.Exception.Message)"
+    }
+    finally {
+        Pop-Location
+    }
 }
 
 # ------------------------------------------------------------- novo estado ---
@@ -173,6 +257,7 @@ $novoEstado = [pscustomobject]@{
     next       = $proximo
     lastRun    = $agenteId
     lastResult = $resultado
+    lastCommit = $commitFeito
     lastAt     = (Get-Date).ToString('o')
 }
 $novoEstado | ConvertTo-Json | Set-Content -Path $StatePath -Encoding utf8

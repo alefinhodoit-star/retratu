@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Retratu">
-  <rect width="128" height="128" rx="18" fill="#1a1a1b"/>
-  <circle cx="64" cy="64" r="43" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.55"/>
-  <path d="M35 96V32h28c17 0 27 8 27 22 0 10-6 17-15 20l17 22H75L61 76h-9v20H35Zm17-34h10c8 0 12-3 12-8s-4-8-12-8H52v16Z" fill="#f7f4ef"/>
-  <circle cx="96" cy="32" r="5" fill="#d4af37"/>
-</svg>

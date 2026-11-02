@@ -37,3 +37,9 @@ dist-ssr
 
 # Local link to a Base44 app, written by `base44 link`
 base44/.app.jsonc
+
+# Automação de agentes — estado local, nunca versionar.
+# Os backups contêm uma cópia completa de src/ e não devem entrar no repositório.
+.opencode/automation/backups/
+.opencode/automation/logs/
+.opencode/automation/state.json
