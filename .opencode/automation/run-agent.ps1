@@ -4,7 +4,7 @@
 #   1. Checkpoint git (se o repositório existir) + backup local em backups/
 #   2. `opencode run --agent <id> --auto` com o prompt de prompts/<id>.md
 #   3. `npm run build`
-#   4. Se o build falhar: git reset --hard para o checkpoint (e restauro do backup como 2.ª rede)
+#   4. Se o build falhar: git reset --hard para o checkpoint (backup local como 2.ª rede)
 #   5. Se o build passar: commit automático com prefixo auto(<agente>)
 #   6. Avança o estado da rotação
 #
@@ -36,6 +36,27 @@ $Rotacao         = @('ui-ux', 'perf', 'security')
 foreach ($d in @($LogDir, $BackupDir)) {
     if (-not (Test-Path $d)) {
         New-Item -ItemType Directory -Path $d -Force | Out-Null
+    }
+}
+
+# --------------------------------------------------------------- utilitários ---
+# Executa um comando externo sem deixar que os avisos em stderr (CRLF do git,
+# warnings do vite) sejam interpretados como erro fatal pelo ErrorActionPreference.
+function Invoke-Externo {
+    param(
+        [string]$Ficheiro,
+        [string[]]$Argumentos
+    )
+    $anterior = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $saida = & $Ficheiro @Argumentos 2>&1 | Out-String
+        $codigo = $LASTEXITCODE
+        if ($null -eq $codigo) { $codigo = 0 }
+        return [pscustomobject]@{ Codigo = [int]$codigo; Saida = $saida.Trim() }
+    }
+    finally {
+        $ErrorActionPreference = $anterior
     }
 }
 
@@ -78,28 +99,35 @@ if ($DryRun) {
 }
 
 $gitDisponivel = Test-Path (Join-Path $Root '.git')
-Escrever-Log "Repositório git: $(if ($gitDisponivel) { 'sim' } else { 'não' })"
+if ($gitDisponivel) {
+    Escrever-Log 'Repositório git: sim'
+}
+else {
+    Escrever-Log 'Repositório git: não (apenas backup local)'
+}
 
 # --------------------------------------------------------------- checkpoint ---
 $checkpoint = $null
 if ($gitDisponivel) {
-    Push-Location $Root
-    try {
-        git add -A 2>&1 | Out-Null
-        $pendente = (git status --porcelain 2>&1 | Out-String).Trim()
-        if ($pendente) {
-            git commit -q -m "chore(automacao): checkpoint antes de $agenteId" 2>&1 | Out-Null
+    $add = Invoke-Externo 'git' @('-C', $Root, 'add', '-A')
+    $status = Invoke-Externo 'git' @('-C', $Root, 'status', '--porcelain')
+    if ($status.Saida) {
+        $msg = 'chore(automacao): checkpoint antes de ' + $agenteId
+        $commit = Invoke-Externo 'git' @('-C', $Root, 'commit', '-q', '-m', $msg)
+        if ($commit.Codigo -eq 0) {
             Escrever-Log 'Trabalho pendente guardado num commit de checkpoint.'
         }
-        $checkpoint = (git rev-parse HEAD 2>&1 | Out-String).Trim()
+        else {
+            Escrever-Log "AVISO: commit de checkpoint falhou — $($commit.Saida)"
+        }
+    }
+    $rev = Invoke-Externo 'git' @('-C', $Root, 'rev-parse', 'HEAD')
+    if ($rev.Codigo -eq 0 -and $rev.Saida) {
+        $checkpoint = $rev.Saida
         Escrever-Log "Checkpoint git: $checkpoint"
     }
-    catch {
-        Escrever-Log "AVISO: checkpoint git falhou — $($_.Exception.Message)"
-        $checkpoint = $null
-    }
-    finally {
-        Pop-Location
+    else {
+        Escrever-Log 'AVISO: não foi possível obter o SHA do checkpoint.'
     }
 }
 
@@ -156,14 +184,18 @@ $argumentos = 'run --agent ' + $agenteId +
 
 Escrever-Log "A executar: opencode run --agent $agenteId --auto (limite $TimeoutSegundos s)"
 
-$codigoSaida = -1
 try {
-    $proc = Start-Process -FilePath $OpenCode -ArgumentList $argumentos -NoNewWindow -PassThru `
-        -RedirectStandardOutput $outFile -RedirectStandardError $errFile
+    # -WorkingDirectory é obrigatório: sem ele a tarefa arranca em System32 e o
+    # OpenCode não descobre .opencode/agents (erro "Agent not found").
+    $proc = Start-Process -FilePath $OpenCode -ArgumentList $argumentos -WorkingDirectory $Root `
+        -NoNewWindow -PassThru -RedirectStandardOutput $outFile -RedirectStandardError $errFile
+
     $terminou = $proc.WaitForExit($TimeoutSegundos * 1000)
     if ($terminou) {
-        $codigoSaida = $proc.ExitCode
-        Escrever-Log "Agente terminou com código $codigoSaida."
+        $proc.Refresh()
+        $codigoAgente = $proc.ExitCode
+        if ($null -eq $codigoAgente) { $codigoAgente = -1 }
+        Escrever-Log "Agente terminou com código $codigoAgente."
     }
     else {
         $proc.Kill()
@@ -182,40 +214,25 @@ foreach ($f in @($outFile, $errFile)) {
 }
 
 # ----------------------------------------------------------- verificação -----
-$buildOk = $false
-$buildSaida = ''
-Push-Location $Root
-try {
-    $buildSaida = & $Npm 'run', 'build' 2>&1 | Out-String
-    $buildOk = ($LASTEXITCODE -eq 0)
-}
-catch {
-    $buildSaida = $_.Exception.Message
-}
-finally {
-    Pop-Location
-}
+$build = Invoke-Externo $Npm @('run', 'build')
+$buildOk = ($build.Codigo -eq 0)
 
 if ($buildOk) {
     Escrever-Log 'Build OK — alterações mantidas.'
 }
 else {
-    Escrever-Log 'Build FALHOU — a reverter.'
-    Add-Content -Path $logPath -Value $buildSaida -Encoding utf8
+    Escrever-Log "Build FALHOU (código $($build.Codigo)) — a reverter."
+    Add-Content -Path $logPath -Value $build.Saida -Encoding utf8
 
     if ($gitDisponivel -and $checkpoint) {
-        Push-Location $Root
-        try {
-            git reset --hard $checkpoint 2>&1 | Out-Null
-            git clean -fd -- src 2>&1 | Out-Null
+        $reset = Invoke-Externo 'git' @('-C', $Root, 'reset', '--hard', $checkpoint)
+        $clean = Invoke-Externo 'git' @('-C', $Root, 'clean', '-fd', '--', 'src')
+        if ($reset.Codigo -eq 0) {
             Escrever-Log "git reset --hard $checkpoint concluído."
         }
-        catch {
-            Escrever-Log "AVISO: reset git falhou — $($_.Exception.Message). A usar o backup local."
+        else {
+            Escrever-Log "AVISO: reset git falhou — $($reset.Saida). A usar o backup local."
             Restaurar-Backup
-        }
-        finally {
-            Pop-Location
         }
     }
     else {
@@ -227,24 +244,21 @@ else {
 # ------------------------------------------------------------- commit final ---
 $commitFeito = $false
 if ($gitDisponivel -and $buildOk) {
-    Push-Location $Root
-    try {
-        git add -A 2>&1 | Out-Null
-        $alterado = (git status --porcelain 2>&1 | Out-String).Trim()
-        if ($alterado) {
-            git commit -q -m "auto($agenteId): melhorias automaticas" 2>&1 | Out-Null
+    $add = Invoke-Externo 'git' @('-C', $Root, 'add', '-A')
+    $status = Invoke-Externo 'git' @('-C', $Root, 'status', '--porcelain')
+    if ($status.Saida) {
+        $msg = 'auto(' + $agenteId + '): melhorias automaticas'
+        $commit = Invoke-Externo 'git' @('-C', $Root, 'commit', '-q', '-m', $msg)
+        if ($commit.Codigo -eq 0) {
             $commitFeito = $true
             Escrever-Log 'Commit automático criado.'
         }
         else {
-            Escrever-Log 'Sem alterações para commitar.'
+            Escrever-Log "AVISO: commit automático falhou — $($commit.Saida)"
         }
     }
-    catch {
-        Escrever-Log "AVISO: commit automático falhou — $($_.Exception.Message)"
-    }
-    finally {
-        Pop-Location
+    else {
+        Escrever-Log 'Sem alterações para commitar.'
     }
 }
 
