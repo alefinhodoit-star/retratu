@@ -1,0 +1,63 @@
+{
+  "name": "ProdutoLoja",
+  "type": "object",
+  "properties": {
+    "nome": {
+      "type": "string"
+    },
+    "categoria_slug": {
+      "type": "string",
+      "description": "Identificador da categoria a que o produto pertence"
+    },
+    "grupo": {
+      "type": "string",
+      "description": "Grupo dentro da categoria (ex.: Tipos, Formatos)"
+    },
+    "nota_grupo": {
+      "type": "string",
+      "description": "Nota apresentada sob o t\u00edtulo do grupo"
+    },
+    "detalhe": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o curta mostrada ao lado do nome"
+    },
+    "imagem": {
+      "type": "string",
+      "description": "URL da imagem demonstrativa do produto, guardada em armazenamento p\u00fablico"
+    },
+    "preco": {
+      "type": "number",
+      "description": "Pre\u00e7o desde, com IVA a 23% inclu\u00eddo. Vazio significa or\u00e7amento \u00e0 medida"
+    },
+    "ordem": {
+      "type": "number",
+      "default": 0
+    },
+    "ativo": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "nome",
+    "categoria_slug"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

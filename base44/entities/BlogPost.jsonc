@@ -1,0 +1,38 @@
+{
+  "name": "BlogPost",
+  "type": "object",
+  "properties": {
+    "titulo": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "categoria": {
+      "type": "string"
+    },
+    "resumo": {
+      "type": "string"
+    },
+    "conteudo": {
+      "type": "string",
+      "description": "Corpo do artigo em Markdown"
+    },
+    "imagem": {
+      "type": "string"
+    },
+    "autor": {
+      "type": "string"
+    },
+    "tempo_leitura": {
+      "type": "string"
+    },
+    "data": {
+      "type": "string",
+      "format": "date"
+    },
+    "publicado": {
+      "type": "boolean",
+      "default": true
+    }
+  },
