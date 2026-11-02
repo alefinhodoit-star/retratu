@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useLeadSubmit } from "@/lib/useLeadSubmit";
+import { esquemaContacto } from "@/lib/leads";
+import { validarFormulario } from "@/lib/validacao";
 
 const CAMPO =
   "mt-3 h-12 rounded-none border-0 border-b border-border bg-transparent px-0 focus-visible:border-b-2 focus-visible:border-foreground focus-visible:ring-0";
@@ -13,12 +15,22 @@ const CAMPO =
 export default function Contact() {
   const { enviar, enviando, sucesso, erro } = useLeadSubmit();
   const [form, setForm] = useState({ nome: "", email: "", mensagem: "" });
+  const [erros, setErros] = useState({});
 
-  const atualizar = (campo) => (e) => setForm({ ...form, [campo]: e.target.value });
+  const atualizar = (campo) => (e) => {
+    const { value } = e.target;
+    setForm((atual) => ({ ...atual, [campo]: value }));
+    // Limpa o erro do campo assim que este volta a ser editado.
+    setErros((atual) => (atual[campo] ? { ...atual, [campo]: "" } : atual));
+  };
 
   const submeter = async (e) => {
     e.preventDefault();
-    await enviar({ ...form, origem: "contacto" });
+    // O `required` do HTML é apenas UX: um POST direto ignora-o.
+    const { erros: invalidos, dados } = validarFormulario(esquemaContacto(), form);
+    setErros(invalidos);
+    if (!dados) return;
+    await enviar({ ...dados, origem: "contacto" });
   };
 
   return (
@@ -103,8 +115,15 @@ export default function Contact() {
                     value={form.nome}
                     onChange={atualizar("nome")}
                     placeholder="O seu nome"
+                    aria-invalid={Boolean(erros.nome)}
+                    aria-describedby={erros.nome ? "contacto-nome-erro" : undefined}
                     className={CAMPO}
                   />
+                  {erros.nome && (
+                    <p id="contacto-nome-erro" role="alert" className="mt-2 text-[0.85rem] text-destructive">
+                      {erros.nome}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="contacto-email" className="eyebrow">
@@ -118,8 +137,15 @@ export default function Contact() {
                     value={form.email}
                     onChange={atualizar("email")}
                     placeholder="nome@email.pt"
+                    aria-invalid={Boolean(erros.email)}
+                    aria-describedby={erros.email ? "contacto-email-erro" : undefined}
                     className={CAMPO}
                   />
+                  {erros.email && (
+                    <p id="contacto-email-erro" role="alert" className="mt-2 text-[0.85rem] text-destructive">
+                      {erros.email}
+                    </p>
+                  )}
                 </div>
               </div>
               <div>
@@ -133,8 +159,15 @@ export default function Contact() {
                   value={form.mensagem}
                   onChange={atualizar("mensagem")}
                   placeholder="Conte-nos o que precisa — quanto mais contexto, melhor o conseguimos ajudar."
+                  aria-invalid={Boolean(erros.mensagem)}
+                  aria-describedby={erros.mensagem ? "contacto-mensagem-erro" : undefined}
                   className="mt-3 rounded-none border-0 border-b border-border bg-transparent px-0 focus-visible:border-b-2 focus-visible:border-foreground focus-visible:ring-0"
                 />
+                {erros.mensagem && (
+                  <p id="contacto-mensagem-erro" role="alert" className="mt-2 text-[0.85rem] text-destructive">
+                    {erros.mensagem}
+                  </p>
+                )}
               </div>
 
               {erro && (

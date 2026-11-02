@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MEDIA } from "@/lib/media";
 import { useLeadSubmit } from "@/lib/useLeadSubmit";
+import { esquemaEmpresa } from "@/lib/leads";
+import { validarFormulario } from "@/lib/validacao";
 
 const CAMPO =
   "mt-3 h-12 rounded-none border-0 border-b border-background/40 bg-transparent px-0 text-background placeholder:text-background/60 focus-visible:border-b-2 focus-visible:border-accent focus-visible:ring-0";
@@ -24,12 +26,22 @@ export default function B2B() {
     colaboradores: "",
     email: "",
   });
+  const [erros, setErros] = useState({});
 
-  const atualizar = (campo) => (e) => setForm({ ...form, [campo]: e.target.value });
+  const atualizar = (campo) => (e) => {
+    const { value } = e.target;
+    setForm((atual) => ({ ...atual, [campo]: value }));
+    // Limpa o erro do campo assim que este volta a ser editado.
+    setErros((atual) => (atual[campo] ? { ...atual, [campo]: "" } : atual));
+  };
 
   const submeter = async (e) => {
     e.preventDefault();
-    await enviar({ ...form, origem: "empresa" });
+    // O `required` do HTML é apenas UX: um POST direto ignora-o.
+    const { erros: invalidos, dados } = validarFormulario(esquemaEmpresa(), form);
+    setErros(invalidos);
+    if (!dados) return;
+    await enviar({ ...dados, origem: "empresa" });
   };
 
   return (
@@ -110,8 +122,15 @@ export default function B2B() {
                       value={form.empresa}
                       onChange={atualizar("empresa")}
                       placeholder="Nome da empresa"
+                      aria-invalid={Boolean(erros.empresa)}
+                      aria-describedby={erros.empresa ? "b2b-empresa-erro" : undefined}
                       className={CAMPO}
                     />
+                    {erros.empresa && (
+                      <p id="b2b-empresa-erro" role="alert" className="mt-2 text-[0.85rem] text-accent">
+                        {erros.empresa}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -125,8 +144,19 @@ export default function B2B() {
                       value={form.colaboradores}
                       onChange={atualizar("colaboradores")}
                       placeholder="Ex.: 25"
+                      aria-invalid={Boolean(erros.colaboradores)}
+                      aria-describedby={erros.colaboradores ? "b2b-colaboradores-erro" : undefined}
                       className={CAMPO}
                     />
+                    {erros.colaboradores && (
+                      <p
+                        id="b2b-colaboradores-erro"
+                        role="alert"
+                        className="mt-2 text-[0.85rem] text-accent"
+                      >
+                        {erros.colaboradores}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -141,8 +171,15 @@ export default function B2B() {
                       value={form.email}
                       onChange={atualizar("email")}
                       placeholder="nome@empresa.pt"
+                      aria-invalid={Boolean(erros.email)}
+                      aria-describedby={erros.email ? "b2b-email-erro" : undefined}
                       className={CAMPO}
                     />
+                    {erros.email && (
+                      <p id="b2b-email-erro" role="alert" className="mt-2 text-[0.85rem] text-accent">
+                        {erros.email}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -156,8 +193,15 @@ export default function B2B() {
                       value={form.nome}
                       onChange={atualizar("nome")}
                       placeholder="Nome do contacto"
+                      aria-invalid={Boolean(erros.nome)}
+                      aria-describedby={erros.nome ? "b2b-nome-erro" : undefined}
                       className={CAMPO}
                     />
+                    {erros.nome && (
+                      <p id="b2b-nome-erro" role="alert" className="mt-2 text-[0.85rem] text-accent">
+                        {erros.nome}
+                      </p>
+                    )}
                   </div>
 
                   {erro && (

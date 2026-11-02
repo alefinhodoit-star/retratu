@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { camposDoServico } from "./servicos";
 
+export { validar } from "../validacao";
+
 const mensagemCampo = (label) => `Indique: ${label.replace(/\?$/, "")}.`;
 
 function campoCondicional(campo) {
@@ -79,15 +81,3 @@ export function esquemaAutorizacao() {
   });
 }
 
-export function validar(esquema, dados) {
-  const resultado = esquema.safeParse(dados);
-  if (resultado.success) return {};
-
-  const erros = {};
-  for (const problema of resultado.error.issues) {
-    const caminho = problema.path.join(".");
-    const chave = caminho.startsWith("respostas.") ? caminho.slice("respostas.".length) : caminho;
-    if (!erros[chave]) erros[chave] = problema.message;
-  }
-  return erros;
-}
