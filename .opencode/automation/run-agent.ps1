@@ -29,6 +29,10 @@ $PromptDir = Join-Path $AutoDir 'prompts'
 $OpenCode = Join-Path $env:APPDATA 'npm\opencode.cmd'
 $Npm      = 'C:\Program Files\nodejs\npm.cmd'
 
+# Modelo usado pelos agentes automáticos. Sem isto, o `opencode run` usa o modelo
+# por omissão, que neste ambiente devolve "This model is not available in your country".
+$Modelo = 'opencode-go/deepseek-v4.1-flash'
+
 $TimeoutSegundos = 1800
 $ManterBackups   = 10
 $Rotacao         = @('ui-ux', 'perf', 'security')
@@ -38,6 +42,10 @@ foreach ($d in @($LogDir, $BackupDir)) {
         New-Item -ItemType Directory -Path $d -Force | Out-Null
     }
 }
+
+# A tarefa agendada arranca em C:\Windows\System32. Sem isto, `npm run build`
+# falha com ENOENT (não encontra o package.json) e o OpenCode não vê o projeto.
+Set-Location $Root
 
 # --------------------------------------------------------------- utilitários ---
 # Executa um comando externo sem deixar que os avisos em stderr (CRLF do git,
@@ -178,11 +186,12 @@ $errFile = Join-Path $LogDir "$stamp-$agenteId.err.txt"
 
 # O prompt vai como ficheiro anexado: evita passar texto multilinha por cmd.exe.
 $argumentos = 'run --agent ' + $agenteId +
+    ' --model "' + $Modelo + '"' +
     ' --auto --title "Automacao ' + $agenteId + '"' +
     ' --file "' + $promptPath + '"' +
     ' "Segue as instrucoes do ficheiro anexado e aplica-as."'
 
-Escrever-Log "A executar: opencode run --agent $agenteId --auto (limite $TimeoutSegundos s)"
+Escrever-Log "A executar: opencode run --agent $agenteId --model $Modelo (limite $TimeoutSegundos s)"
 
 try {
     # -WorkingDirectory é obrigatório: sem ele a tarefa arranca em System32 e o
