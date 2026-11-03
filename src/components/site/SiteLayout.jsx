@@ -1,14 +1,25 @@
 import { db } from "@/api/base44Client";
 
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
-import CartDrawer from "@/components/cart/CartDrawer";
+import { useCart } from "@/lib/cart";
+
+// O carrinho arrasta o framer-motion (~120 kB) para o bundle de entrada e só é
+// usado depois de o visitante o abrir. Depois da primeira abertura fica montado
+// para as animações de saída (AnimatePresence) continuarem a funcionar.
+const CartDrawer = lazy(() => import("@/components/cart/CartDrawer"));
 
 export default function SiteLayout() {
   const [user, setUser] = useState(null);
+  const { aberto } = useCart();
+  const [carrinhoMontado, setCarrinhoMontado] = useState(false);
+
+  useEffect(() => {
+    if (aberto) setCarrinhoMontado(true);
+  }, [aberto]);
 
   useEffect(() => {
     let ativo = true;
@@ -28,7 +39,11 @@ export default function SiteLayout() {
         <Outlet />
       </main>
       <Footer />
-      <CartDrawer />
+      {(aberto || carrinhoMontado) && (
+        <Suspense fallback={null}>
+          <CartDrawer />
+        </Suspense>
+      )}
     </div>
   );
 }
