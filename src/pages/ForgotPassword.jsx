@@ -35,13 +35,17 @@ export default function ForgotPassword() {
       footer={
         <Link
           to="/login"
-          className="inline-flex items-center gap-1.5 font-medium text-foreground underline decoration-accent underline-offset-4 hover:decoration-2"
+          className="inline-flex min-h-11 items-center gap-1.5 font-medium text-foreground underline decoration-accent underline-offset-4 hover:decoration-2"
         >
-          <ArrowLeft className="h-3.5 w-3.5" />
+          <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
           Voltar ao início de sessão
         </Link>
       }
     >
+      {/* Região viva persistente: garante que a confirmação é anunciada após o envio. */}
+      <p role="status" aria-live="polite" className="sr-only">
+        {sent ? "Pedido enviado. Se existir uma conta com este e-mail, receberá o link em poucos minutos." : ""}
+      </p>
       {sent ? (
         <div className="text-center">
           <p className="text-[0.95rem] leading-relaxed text-muted-foreground">
@@ -78,7 +82,7 @@ export default function ForgotPassword() {
           <Button type="submit" className="h-12 w-full rounded-full font-medium" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                 A enviar…
               </>
             ) : (

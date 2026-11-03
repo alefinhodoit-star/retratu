@@ -68,22 +68,23 @@ export default function Conta() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {user?.role === "admin" && (
-            <Button asChild variant="outline" className="rounded-full">
+            <Button asChild variant="outline" className="min-h-11 rounded-full">
               <Link to="/admin">
-                <ShieldCheck className="mr-2 h-4 w-4" /> Área de administração
+                <ShieldCheck className="mr-2 h-4 w-4" aria-hidden="true" /> Área de administração
               </Link>
             </Button>
           )}
-          <Button variant="ghost" onClick={terminarSessao} className="rounded-full">
-            <LogOut className="mr-2 h-4 w-4" /> Terminar sessão
+          <Button variant="ghost" onClick={terminarSessao} className="min-h-11 rounded-full">
+            <LogOut className="mr-2 h-4 w-4" aria-hidden="true" /> Terminar sessão
           </Button>
         </div>
       </div>
 
       <div className="mt-14">
         {carregando ? (
-          <div className="flex h-48 items-center justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <div role="status" className="flex h-48 items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
+            <span className="sr-only">A carregar os seus pedidos…</span>
           </div>
         ) : pedidos.length === 0 ? (
           <div className="rounded-[1.5rem] border border-border bg-card p-9 text-center">
@@ -93,12 +94,12 @@ export default function Conta() {
               com IVA incluído — e sem subscrição.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <Button asChild className="rounded-full px-7">
+              <Button asChild className="min-h-11 rounded-full px-7">
                 <Link to="/#pacotes">
-                  Escolher pacote <ArrowRight className="ml-2 h-4 w-4" />
+                  Escolher pacote <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="rounded-full px-7">
+              <Button asChild variant="outline" className="min-h-11 rounded-full px-7">
                 <Link to="/#contactos">Falar connosco</Link>
               </Button>
             </div>

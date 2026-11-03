@@ -26,7 +26,7 @@ export default function Blog() {
   const [primeiro, ...restantes] = posts;
 
   return (
-    <div className="mx-auto max-w-7xl px-6 pb-24 pt-16 lg:pt-24">
+    <div className="mx-auto max-w-7xl px-6 pb-24 pt-16 lg:pt-24" aria-busy={carregando}>
       <div className="max-w-3xl">
         <span className="eyebrow">Blog Retratu</span>
         <h1 className="mt-6 text-balance font-display text-[2.4rem] leading-[1.06] sm:text-[3.1rem]">
@@ -42,8 +42,9 @@ export default function Blog() {
       </div>
 
       {carregando ? (
-        <div className="flex h-64 items-center justify-center">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <div role="status" className="flex h-64 items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
+          <span className="sr-only">A carregar os artigos…</span>
         </div>
       ) : erro ? (
         <div className="mt-16 rounded-[1.5rem] border border-dashed border-border bg-card p-9 text-center">

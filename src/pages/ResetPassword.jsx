@@ -18,6 +18,9 @@ export default function ResetPassword() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Marca o campo de confirmação quando o erro apresentado é a divergência entre palavras-passe.
+  const senhasDiferentes = Boolean(error) && confirmPassword.length > 0 && newPassword !== confirmPassword;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -67,6 +70,7 @@ export default function ResetPassword() {
     >
       {error && (
         <div
+          id="erro-recuperacao"
           role="alert"
           className="mb-4 rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-[0.88rem] text-destructive"
         >
@@ -90,6 +94,8 @@ export default function ResetPassword() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               className="h-12 pl-10"
+              aria-invalid={error ? "true" : undefined}
+              aria-describedby={error ? "erro-recuperacao" : undefined}
               required
             />
           </div>
@@ -109,6 +115,8 @@ export default function ResetPassword() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="h-12 pl-10"
+              aria-invalid={senhasDiferentes ? "true" : undefined}
+              aria-describedby={senhasDiferentes ? "erro-recuperacao" : undefined}
               required
             />
           </div>
@@ -116,7 +124,7 @@ export default function ResetPassword() {
         <Button type="submit" className="h-12 w-full rounded-full font-medium" disabled={loading}>
           {loading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
               A guardar…
             </>
           ) : (

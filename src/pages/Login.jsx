@@ -75,6 +75,7 @@ export default function Login() {
 
       {error && (
         <div
+          id="erro-login"
           role="alert"
           className="mb-4 rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-[0.88rem] text-destructive"
         >
@@ -99,6 +100,8 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="h-12 pl-10"
+              aria-invalid={error ? "true" : undefined}
+              aria-describedby={error ? "erro-login" : undefined}
               required
             />
           </div>
@@ -126,6 +129,8 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="h-12 pl-10"
+              aria-invalid={error ? "true" : undefined}
+              aria-describedby={error ? "erro-login" : undefined}
               required
             />
           </div>
@@ -133,7 +138,7 @@ export default function Login() {
         <Button type="submit" className="h-12 w-full rounded-full font-medium" disabled={loading}>
           {loading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
               A entrar…
             </>
           ) : (

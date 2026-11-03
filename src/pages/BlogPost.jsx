@@ -26,8 +26,9 @@ export default function BlogPost() {
 
   if (carregando) {
     return (
-      <div className="flex h-96 items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div role="status" className="flex h-96 items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
+        <span className="sr-only">A carregar o artigo…</span>
       </div>
     );
   }
@@ -41,9 +42,9 @@ export default function BlogPost() {
         </p>
         <Link
           to="/blog"
-          className="mt-8 inline-flex items-center gap-2 text-[0.95rem] underline underline-offset-4"
+          className="mt-8 inline-flex min-h-11 items-center gap-2 text-[0.95rem] underline underline-offset-4"
         >
-          <ArrowLeft className="h-4 w-4" /> Voltar ao blog
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Voltar ao blog
         </Link>
       </div>
     );
@@ -54,9 +55,9 @@ export default function BlogPost() {
       <div className="mx-auto max-w-3xl px-6">
         <Link
           to="/blog"
-          className="inline-flex items-center gap-2 text-[0.85rem] text-muted-foreground underline-offset-4 hover:underline"
+          className="inline-flex min-h-11 items-center gap-2 text-[0.85rem] text-muted-foreground underline-offset-4 hover:underline"
         >
-          <ArrowLeft className="h-4 w-4" /> Blog Retratu
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Blog Retratu
         </Link>
         <div className="mt-8 flex items-center gap-3 text-[0.72rem] uppercase tracking-[0.18em] text-muted-foreground">
           {post.categoria && <span>{post.categoria}</span>}
@@ -126,7 +127,7 @@ export default function BlogPost() {
             >
               Ver pacotes de retratos
             </Link>
-            <Link to="/#contactos" className="link-quiet">
+            <Link to="/#contactos" className="link-quiet min-h-11">
               Falar connosco
             </Link>
           </div>

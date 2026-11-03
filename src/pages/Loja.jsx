@@ -43,7 +43,7 @@ export default function Loja() {
           <div className="mt-9 flex flex-wrap items-center gap-5">
             <Button asChild className="h-14 rounded-full px-7 py-6">
               <Link to="/#contactos">
-                Pedir orçamento <ArrowRight className="ml-2 h-4 w-4" />
+                Pedir orçamento <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
               </Link>
             </Button>
             <p className="max-w-sm text-[0.88rem] text-muted-foreground">
@@ -60,8 +60,9 @@ export default function Loja() {
 
       {carregando ? (
         <section className="border-t border-border">
-          <div className="flex items-center justify-center py-24">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <div role="status" className="flex items-center justify-center py-24">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
+            <span className="sr-only">A carregar o catálogo…</span>
           </div>
         </section>
       ) : categorias.length === 0 ? (
