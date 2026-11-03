@@ -86,6 +86,7 @@ export default function Hero() {
             antes={MEDIA.antesMulher}
             depois={MEDIA.depoisMulher}
             legenda="Retrato executivo para LinkedIn"
+            priority
             className="relative"
           />
         </div>

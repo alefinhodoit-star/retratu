@@ -2,8 +2,12 @@ import { useState } from "react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 
-/** Comparador «antes / depois» com máscara de abertura — deslize para revelar o retrato. */
-export default function BeforeAfter({ antes, depois, legenda, className }) {
+/**
+ * Comparador «antes / depois» com máscara de abertura — deslize para revelar o retrato.
+ * `priority` marca as imagens acima da dobra (hero/LCP); sem ele o download é adiado,
+ * para que os ~337 kB da galeria não disputem largura de banda com a primeira pintura.
+ */
+export default function BeforeAfter({ antes, depois, legenda, className, priority = false }) {
   const [pos, setPos] = useState(55);
 
   return (
@@ -14,6 +18,8 @@ export default function BeforeAfter({ antes, depois, legenda, className }) {
             src={depois}
             alt={`${legenda} — retrato final gerado com IA`}
             fittingType="fill"
+            priority={priority}
+            loading="lazy"
             className="absolute inset-0 h-full w-full"
           />
           <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
@@ -21,6 +27,8 @@ export default function BeforeAfter({ antes, depois, legenda, className }) {
               src={antes}
               alt={`${legenda} — fotografia original`}
               fittingType="fill"
+              priority={priority}
+              loading="lazy"
               className="h-full w-full"
             />
           </div>
