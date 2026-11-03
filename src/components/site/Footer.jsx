@@ -103,11 +103,11 @@ export default function Footer() {
           <ul className="mt-4 space-y-4 text-[0.95rem] text-muted-foreground">
             <li>
               <a
-                href="mailto:ola@retratu.pt"
+                href="mailto:contacto@retratu.pt"
                 className="inline-flex min-h-11 items-center gap-2.5 transition-colors hover:text-foreground"
               >
                 <Mail className="h-4 w-4 text-accent" strokeWidth={1.7} aria-hidden="true" />
-                ola@retratu.pt
+                contacto@retratu.pt
               </a>
             </li>
             <li className="flex items-start gap-2.5">

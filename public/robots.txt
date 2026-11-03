@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Áreas privadas e fluxos de pedido não devem ser indexados.
+Disallow: /admin
+Disallow: /conta
+Disallow: /edicao
+Disallow: /edicao/obrigado
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://retratu.pt/sitemap.xml

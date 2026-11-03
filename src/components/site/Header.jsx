@@ -61,8 +61,8 @@ export default function Header({ user }) {
           <span className="flex items-center gap-2">
             <span aria-hidden="true" className="hidden h-1 w-1 rounded-full bg-accent sm:inline-block" />
             Resposta em até 1 dia útil ·{" "}
-            <a href="mailto:ola@retratu.pt" className="text-background underline-offset-4 hover:underline">
-              ola@retratu.pt
+            <a href="mailto:contacto@retratu.pt" className="text-background underline-offset-4 hover:underline">
+              contacto@retratu.pt
             </a>
           </span>
         </div>

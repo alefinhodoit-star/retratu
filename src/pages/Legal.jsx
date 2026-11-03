@@ -218,8 +218,8 @@ export default function Legal({ tipo }) {
             Respondemos a questões sobre estes documentos em português, por e-mail.
           </p>
         </div>
-        <a href="mailto:ola@retratu.pt" className="link-quiet">
-          ola@retratu.pt
+        <a href="mailto:contacto@retratu.pt" className="link-quiet">
+          contacto@retratu.pt
         </a>
       </div>
     </div>

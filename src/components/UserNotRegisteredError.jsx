@@ -34,7 +34,7 @@ const UserNotRegisteredError = () => {
             Voltar ao site
           </Link>
           <a
-            href="mailto:ola@retratu.pt"
+            href="mailto:contacto@retratu.pt"
             className="inline-flex h-11 items-center justify-center rounded-full bg-foreground px-6 text-[0.9rem] font-medium text-background transition-colors hover:bg-foreground/90"
           >
             Pedir acesso

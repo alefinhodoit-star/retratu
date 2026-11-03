@@ -94,8 +94,8 @@ export default function B2B() {
                   </p>
                   <p className="mt-4 text-[0.85rem] text-background/50">
                     Se preferir, escreva diretamente para{" "}
-                    <a href="mailto:ola@retratu.pt" className="underline underline-offset-4">
-                      ola@retratu.pt
+                    <a href="mailto:contacto@retratu.pt" className="underline underline-offset-4">
+                      contacto@retratu.pt
                     </a>
                     .
                   </p>

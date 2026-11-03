@@ -52,10 +52,10 @@ export default function Contact() {
               </dt>
               <dd className="mt-1 pl-6 text-muted-foreground">
                 <a
-                  href="mailto:ola@retratu.pt"
+                  href="mailto:contacto@retratu.pt"
                   className="underline decoration-accent decoration-1 underline-offset-4 transition-all hover:decoration-2"
                 >
-                  ola@retratu.pt
+                  contacto@retratu.pt
                 </a>
               </dd>
             </div>
@@ -95,8 +95,8 @@ export default function Contact() {
                 Obrigado pelo contacto. Vamos responder para{" "}
                 <strong className="font-medium text-foreground">{form.email}</strong> em até 1 dia
                 útil. Se for urgente, escreva diretamente para{" "}
-                <a href="mailto:ola@retratu.pt" className="underline underline-offset-4">
-                  ola@retratu.pt
+                <a href="mailto:contacto@retratu.pt" className="underline underline-offset-4">
+                  contacto@retratu.pt
                 </a>
                 .
               </p>

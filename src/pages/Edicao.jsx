@@ -390,10 +390,10 @@ export default function Edicao() {
       <p className="mt-8 text-center text-[0.85rem] text-muted-foreground">
         Prefere falar primeiro? Escreva para{" "}
         <a
-          href="mailto:ola@retratu.pt"
+          href="mailto:contacto@retratu.pt"
           className="underline decoration-accent decoration-1 underline-offset-4 hover:decoration-2"
         >
-          ola@retratu.pt
+          contacto@retratu.pt
         </a>{" "}
         — respondemos no mesmo dia útil.
       </p>

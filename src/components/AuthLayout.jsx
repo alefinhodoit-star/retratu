@@ -93,8 +93,8 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
 
         <p className="text-center text-[0.78rem] text-muted-foreground/70 lg:text-right">
           Precisa de ajuda?{" "}
-          <a href="mailto:ola@retratu.pt" className="underline underline-offset-4 hover:text-foreground">
-            ola@retratu.pt
+          <a href="mailto:contacto@retratu.pt" className="underline underline-offset-4 hover:text-foreground">
+            contacto@retratu.pt
           </a>
         </p>
       </main>

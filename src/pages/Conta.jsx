@@ -142,10 +142,10 @@ export default function Conta() {
           Precisa de ajuda com um pedido?
         </span>
         <a
-          href="mailto:ola@retratu.pt"
+          href="mailto:contacto@retratu.pt"
           className="font-medium text-foreground underline decoration-accent decoration-1 underline-offset-4 hover:decoration-2"
         >
-          ola@retratu.pt
+          contacto@retratu.pt
         </a>
       </div>
     </div>
