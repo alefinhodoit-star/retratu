@@ -71,7 +71,13 @@ const Image = React.forwardRef(
       // `decoding="async"` não bloqueia a thread principal durante o decode.
       decoding,
       loading: priority ? "eager" : loading,
-      fetchPriority: priority ? "high" : fetchPriority,
+    }
+
+    // React 18 não reconhece `fetchPriority` (camelCase) e avisa a cada render.
+    // O atributo tem de ser minúsculo e só entra no DOM quando tem valor.
+    const prioridadeFetch = priority ? "high" : fetchPriority
+    if (prioridadeFetch) {
+      imageProps.fetchpriority = prioridadeFetch
     }
 
     // Sem `width`/`height` o browser não sabe a proporção antes do download e o
