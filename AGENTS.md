@@ -17,6 +17,19 @@ If your agent supports Agent Skills, install or update Base44 skills before Base
 npx skills add base44/skills
 ```
 
+## Installed Skills
+
+Skills are committed in `.agents/skills/`, which is the source of truth. `skills-lock.json` is used only by the CLI (`npx skills update`, `npx skills experimental_install`).
+
+**Base44** (`base44/skills`): `base44-cli`, `base44-platform-platform`, `base44-platform-frontend`,
+`base44-platform-entities`, `base44-platform-backend-functions`, `base44-platform-integrations-sdk`,
+`base44-platform-workflows`, `base44-sdk`, `base44-troubleshooter`.
+
+**Web quality** (`vercel-labs/agent-skills`): `vercel-react-best-practices`, `web-design-guidelines`,
+`vercel-composition-patterns`.
+
+Update with `npx skills update -p -y`. Restore from the lock with `npx skills experimental_install`.
+
 ## Key Files
 
 - `src/`: frontend application source.
