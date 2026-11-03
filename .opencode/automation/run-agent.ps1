@@ -182,28 +182,39 @@ if (-not (Test-Path $OpenCode)) {
 }
 
 $outFile = Join-Path $LogDir "$stamp-$agenteId.out.txt"
-$errFile = Join-Path $LogDir "$stamp-$agenteId.err.txt"
+$codeFile = Join-Path $LogDir "$stamp-$agenteId.exit.txt"
 
 # O prompt vai como ficheiro anexado: evita passar texto multilinha por cmd.exe.
+# O comando é escrito num .cmd próprio porque `Start-Process` com
+# -RedirectStandardOutput devolve um ExitCode vazio no PowerShell 5.1.
 $argumentos = 'run --agent ' + $agenteId +
     ' --model "' + $Modelo + '"' +
     ' --auto --title "Automacao ' + $agenteId + '"' +
     ' --file "' + $promptPath + '"' +
     ' "Segue as instrucoes do ficheiro anexado e aplica-as."'
 
+$cmdFile = Join-Path $LogDir "$stamp-$agenteId.cmd"
+$linhasCmd = @(
+    '@echo off',
+    ('"' + $OpenCode + '" ' + $argumentos + ' > "' + $outFile + '" 2>&1'),
+    ('echo %ERRORLEVEL% > "' + $codeFile + '"')
+)
+Set-Content -Path $cmdFile -Value $linhasCmd -Encoding ascii
+
 Escrever-Log "A executar: opencode run --agent $agenteId --model $Modelo (limite $TimeoutSegundos s)"
 
 try {
     # -WorkingDirectory é obrigatório: sem ele a tarefa arranca em System32 e o
     # OpenCode não descobre .opencode/agents (erro "Agent not found").
-    $proc = Start-Process -FilePath $OpenCode -ArgumentList $argumentos -WorkingDirectory $Root `
-        -NoNewWindow -PassThru -RedirectStandardOutput $outFile -RedirectStandardError $errFile
+    $proc = Start-Process -FilePath $cmdFile -WorkingDirectory $Root -WindowStyle Hidden -PassThru
 
     $terminou = $proc.WaitForExit($TimeoutSegundos * 1000)
     if ($terminou) {
-        $proc.Refresh()
-        $codigoAgente = $proc.ExitCode
-        if ($null -eq $codigoAgente) { $codigoAgente = -1 }
+        $codigoAgente = -1
+        if (Test-Path $codeFile) {
+            $bruto = (Get-Content $codeFile -Raw -ErrorAction SilentlyContinue)
+            if ($bruto -and $bruto.Trim() -match '^-?\d+$') { $codigoAgente = [int]$bruto.Trim() }
+        }
         Escrever-Log "Agente terminou com código $codigoAgente."
     }
     else {
@@ -215,7 +226,7 @@ catch {
     Escrever-Log "ERRO ao executar o agente: $($_.Exception.Message)"
 }
 
-foreach ($f in @($outFile, $errFile)) {
+foreach ($f in @($outFile)) {
     if (Test-Path $f) {
         $conteudo = Get-Content $f -Raw -Encoding utf8 -ErrorAction SilentlyContinue
         if ($conteudo) { Add-Content -Path $logPath -Value $conteudo -Encoding utf8 }
