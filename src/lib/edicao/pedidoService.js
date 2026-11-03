@@ -1,4 +1,5 @@
 import { db } from "@/api/base44Client";
+import { z } from "zod";
 
 // Camada isolada de submissão de pedidos de edição: validação de ficheiros,
 // carregamento seguro e criação do pedido no backend.
@@ -12,6 +13,10 @@ export const DIMENSAO_MAX = 10000;
 
 const CHAVE_INTERVALO = "retratu:edicao:ultimoPedido";
 const INTERVALO_MINIMO_MS = 30000;
+
+// Timestamp escrito por `criarPedido`; um valor corrompido ou no futuro não
+// deve bloquear indefinidamente o envio (o limite é local, não é segurança).
+const intervaloGuardado = z.coerce.number().int().nonnegative();
 
 export function formatarTamanho(bytes) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
@@ -80,8 +85,10 @@ export function gerarReferencia() {
 }
 
 export function podeEnviarAgora() {
-  const anterior = Number(localStorage.getItem(CHAVE_INTERVALO) ?? 0);
-  return Date.now() - anterior > INTERVALO_MINIMO_MS;
+  const anterior = intervaloGuardado.safeParse(localStorage.getItem(CHAVE_INTERVALO));
+  if (!anterior.success) return true;
+  if (anterior.data > Date.now()) return true;
+  return Date.now() - anterior.data > INTERVALO_MINIMO_MS;
 }
 
 function formatarResposta(campo, valor) {

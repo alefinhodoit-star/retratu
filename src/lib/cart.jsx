@@ -1,15 +1,39 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { z } from "zod";
 import { roundEUR } from "@/lib/pricing";
 
 const CHAVE = "retratu-carrinho";
+const MAX_ITENS = 50;
 
 const CartContext = createContext(null);
+
+// O carrinho vem do localStorage e é editável pelo utilizador. Validar a forma
+// antes de usar evita totais NaN (ex.: preco textual) e quantidades fora dos
+// limites do checkout. Os preços continuam a ter de ser recalculados no backend.
+const numeroGuardado = z.preprocess(
+  (valor) => (typeof valor === "string" && valor.trim() !== "" ? Number(valor) : valor),
+  z.number().finite()
+);
+
+const itemCarrinho = z.object({
+  slug: z.string().trim().min(1).max(120),
+  nome: z.string().trim().min(1).max(200),
+  preco: numeroGuardado.pipe(z.number().positive().max(100000)),
+  tipo: z.enum(["pacote", "extra"]),
+  quantidade: numeroGuardado.pipe(z.number().int().min(1).max(10)),
+});
 
 const lerGuardado = () => {
   try {
     const bruto = window.localStorage.getItem(CHAVE);
-    const itens = bruto ? JSON.parse(bruto) : [];
-    return Array.isArray(itens) ? itens : [];
+    if (!bruto) return [];
+    const dados = JSON.parse(bruto);
+    if (!Array.isArray(dados)) return [];
+    // Itens inválidos são descartados individualmente, sem perder o resto.
+    return dados.slice(0, MAX_ITENS).flatMap((item) => {
+      const resultado = itemCarrinho.safeParse(item);
+      return resultado.success ? [resultado.data] : [];
+    });
   } catch {
     return [];
   }
@@ -25,13 +49,20 @@ export function CartProvider({ children }) {
 
   const adicionar = (item) =>
     setItens((atual) => {
-      const existente = atual.find((i) => i.slug === item.slug);
+      // Só entra no carrinho o que respeitar o mesmo contrato usado na leitura,
+      // incluindo preços que cheguem do backend como string numérica.
+      const valido = itemCarrinho.omit({ quantidade: true }).safeParse(item);
+      if (!valido.success) return atual;
+      const novo = { ...valido.data, quantidade: 1 };
+      const existente = atual.find((i) => i.slug === novo.slug);
       if (existente) {
         return atual.map((i) =>
-          i.slug === item.slug ? { ...i, quantidade: i.quantidade + 1 } : i
+          i.slug === novo.slug
+            ? { ...i, quantidade: Math.min(10, i.quantidade + 1) }
+            : i
         );
       }
-      return [...atual, { ...item, quantidade: 1 }];
+      return [...atual, novo];
     });
 
   const alterarQuantidade = (slug, quantidade) =>
