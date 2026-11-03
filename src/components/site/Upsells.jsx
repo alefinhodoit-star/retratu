@@ -42,7 +42,7 @@ export default function Upsells({ pacotePrincipal }) {
           {pacotePrincipal && (
             <Button onClick={adicionarPacote} className="h-14 rounded-full px-7 py-6">
               Adicionar {pacotePrincipal.nome} ao carrinho
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
             </Button>
           )}
         </div>
@@ -69,9 +69,9 @@ export default function Upsells({ pacotePrincipal }) {
                           type="button"
                           onClick={() => adicionarExtra(opcao)}
                           aria-label={`Adicionar ${opcao.nome} ao carrinho`}
-                          className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-border px-3 py-1.5 text-[0.8rem] transition-colors hover:border-foreground/40 hover:bg-secondary"
+                          className="inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-full border border-border px-4 py-2 text-[0.8rem] transition-colors hover:border-foreground/40 hover:bg-secondary md:min-h-9 md:px-3 md:py-1.5"
                         >
-                          <Plus className="h-3.5 w-3.5" /> Adicionar
+                          <Plus className="h-3.5 w-3.5" aria-hidden="true" /> Adicionar
                         </button>
                       </span>
                     </li>

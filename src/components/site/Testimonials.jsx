@@ -60,7 +60,8 @@ export default function Testimonials() {
               key={item.nome}
               className="flex h-full flex-col rounded-[1.5rem] border border-border bg-card p-7 lg:p-8"
             >
-              <div className="flex gap-0.5" aria-label="Avaliação: 5 de 5 estrelas">
+              {/* role="img" é necessário para que o aria-label seja anunciado. */}
+              <div className="flex gap-0.5" role="img" aria-label="Avaliação: 5 de 5 estrelas">
                 {Array.from({ length: 5 }).map((_, indice) => (
                   <Star key={indice} className="h-3.5 w-3.5 fill-accent text-accent" aria-hidden="true" />
                 ))}

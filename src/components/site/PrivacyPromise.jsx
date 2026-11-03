@@ -56,7 +56,7 @@ export default function PrivacyPromise() {
           <div className="grid gap-px overflow-hidden rounded-[1.5rem] border border-border bg-border sm:grid-cols-2">
             {GARANTIAS.map((item) => (
               <div key={item.titulo} className="bg-background p-7 lg:p-8">
-                <item.icone className="h-5 w-5 text-accent" strokeWidth={1.6} />
+                <item.icone className="h-5 w-5 text-accent" strokeWidth={1.6} aria-hidden="true" />
                 <h3 className="mt-5 font-heading text-[1.15rem] leading-tight">{item.titulo}</h3>
                 <p className="mt-3 text-[0.95rem] leading-relaxed text-muted-foreground">
                   {item.texto}

@@ -38,7 +38,7 @@ export default function BlogCard({ post, destaque = false }) {
           alt={post.titulo}
           fittingType="fill"
           className={cn(
-            "h-full w-full transition-transform duration-500 group-hover:scale-[1.03]",
+            "h-full w-full transition-transform duration-500 motion-safe:group-hover:scale-[1.03]",
             destaque ? "aspect-[16/10] md:aspect-auto" : "aspect-[16/10]"
           )}
         />
@@ -70,9 +70,9 @@ export default function BlogCard({ post, destaque = false }) {
 
         <Link
           to={`/blog/${post.slug}`}
-          className="mt-6 inline-flex items-center gap-2 text-[0.85rem] font-medium underline-offset-4 hover:underline"
+          className="mt-6 inline-flex min-h-11 items-center gap-2 text-[0.85rem] font-medium underline-offset-4 hover:underline"
         >
-          Ler artigo <ArrowRight className="h-4 w-4" />
+          Ler artigo <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>
     </article>
