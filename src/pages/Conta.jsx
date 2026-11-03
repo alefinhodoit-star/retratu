@@ -139,7 +139,7 @@ export default function Conta() {
 
       <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-[1.25rem] border border-border bg-secondary/40 p-6 text-[0.9rem] text-muted-foreground">
         <span className="flex items-center gap-2">
-          <Mail className="h-4 w-4 text-accent" />
+          <Mail className="h-4 w-4 text-accent" aria-hidden="true" />
           Precisa de ajuda com um pedido?
         </span>
         <a

@@ -43,8 +43,9 @@ export default function EdicaoObrigado() {
 
   if (carregando) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div role="status" aria-busy="true" className="flex min-h-[50vh] items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
+        <span className="sr-only">A carregar o seu pedido…</span>
       </div>
     );
   }
@@ -128,7 +129,7 @@ export default function EdicaoObrigado() {
       <div className="mt-10 flex flex-col gap-3 sm:flex-row">
         <Button asChild className="h-12 rounded-full px-7">
           <Link to="/edicao">
-            Criar novo pedido <ArrowRight className="ml-2 h-4 w-4" />
+            Criar novo pedido <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
           </Link>
         </Button>
         <Button asChild variant="ghost" className="h-12 rounded-full px-7">

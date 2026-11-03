@@ -40,14 +40,14 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
           <ul className="mt-12 space-y-4 border-t border-background/15 pt-8">
             {PONTOS.map((ponto) => (
               <li key={ponto.texto} className="flex gap-3 text-[0.92rem] leading-relaxed text-background/70">
-                <ponto.icone className="mt-0.5 h-4 w-4 shrink-0 text-accent" strokeWidth={1.7} />
+                <ponto.icone className="mt-0.5 h-4 w-4 shrink-0 text-accent" strokeWidth={1.7} aria-hidden="true" />
                 <span>{ponto.texto}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <p className="relative text-[0.78rem] text-background/40">
+        <p className="relative text-[0.78rem] text-background/60">
           © {new Date().getFullYear()} Retratu · Portugal
         </p>
       </aside>
@@ -60,9 +60,9 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
           </Link>
           <Link
             to="/"
-            className="ml-auto inline-flex items-center gap-1.5 text-[0.85rem] text-muted-foreground transition-colors hover:text-foreground"
+            className="ml-auto inline-flex min-h-11 items-center gap-1.5 text-[0.85rem] text-muted-foreground transition-colors hover:text-foreground"
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
             Voltar ao site
           </Link>
         </div>
@@ -91,7 +91,7 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
           </div>
         </div>
 
-        <p className="text-center text-[0.78rem] text-muted-foreground/70 lg:text-right">
+        <p className="text-center text-[0.78rem] text-muted-foreground lg:text-right">
           Precisa de ajuda?{" "}
           <a href="mailto:contacto@retratu.pt" className="underline underline-offset-4 hover:text-foreground">
             contacto@retratu.pt

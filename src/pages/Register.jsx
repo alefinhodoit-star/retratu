@@ -92,47 +92,54 @@ export default function Register() {
             {error}
           </div>
         )}
-        <div className="mb-6 flex justify-center">
-          <InputOTP
-            maxLength={6}
-            value={otpCode}
-            onChange={setOtpCode}
-            autoFocus
-            autoComplete="one-time-code"
-            aria-label="Código de verificação de 6 dígitos"
-            aria-invalid={error ? "true" : undefined}
-            aria-describedby={error ? "erro-otp" : undefined}
-          >
-            <InputOTPGroup>
-              <InputOTPSlot index={0} />
-              <InputOTPSlot index={1} />
-              <InputOTPSlot index={2} />
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
-            </InputOTPGroup>
-          </InputOTP>
-        </div>
-        <Button
-          className="h-12 w-full rounded-full font-medium"
-          onClick={handleVerify}
-          disabled={loading || otpCode.length < 6}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleVerify();
+          }}
         >
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-              A verificar…
-            </>
-          ) : (
-            "Verificar e continuar"
-          )}
-        </Button>
+          <div className="mb-6 flex justify-center">
+            <InputOTP
+              maxLength={6}
+              value={otpCode}
+              onChange={setOtpCode}
+              autoFocus
+              autoComplete="one-time-code"
+              aria-label="Código de verificação de 6 dígitos"
+              aria-invalid={error ? "true" : undefined}
+              aria-describedby={error ? "erro-otp" : undefined}
+            >
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+          </div>
+          <Button
+            type="submit"
+            className="h-12 w-full rounded-full font-medium"
+            disabled={loading || otpCode.length < 6}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                A verificar…
+              </>
+            ) : (
+              "Verificar e continuar"
+            )}
+          </Button>
+        </form>
         <p className="mt-5 text-center text-[0.88rem] text-muted-foreground">
           Não recebeu o código?{" "}
           <button
             type="button"
             onClick={handleResend}
-            className="font-medium text-foreground underline decoration-accent underline-offset-4 hover:decoration-2"
+            className="-my-2 inline-flex min-h-11 items-center px-1 font-medium text-foreground underline decoration-accent underline-offset-4 hover:decoration-2"
           >
             Reenviar
           </button>

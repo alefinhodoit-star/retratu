@@ -10,7 +10,7 @@ export default function NavCategoriasLoja({ categorias = [] }) {
           <a
             key={categoria.id}
             href={`#${categoria.id}`}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[0.85rem] text-foreground/80 transition-colors hover:border-foreground/40 hover:bg-secondary/60 hover:text-foreground"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[0.85rem] text-foreground/80 transition-colors hover:border-foreground/40 hover:bg-secondary/60 hover:text-foreground"
           >
             <span className="text-[0.7rem] tabular-nums text-muted-foreground">
               {String(indice + 1).padStart(2, "0")}

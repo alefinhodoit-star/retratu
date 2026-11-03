@@ -47,7 +47,10 @@ export default function Blog() {
           <span className="sr-only">A carregar os artigos…</span>
         </div>
       ) : erro ? (
-        <div className="mt-16 rounded-[1.5rem] border border-dashed border-border bg-card p-9 text-center">
+        <div
+          role="alert"
+          className="mt-16 rounded-[1.5rem] border border-dashed border-border bg-card p-9 text-center"
+        >
           <h2 className="font-display text-[1.5rem]">Não conseguimos carregar os artigos</h2>
           <p className="mx-auto mt-4 max-w-md text-muted-foreground">
             Foi um problema passageiro do nosso lado. Tente recarregar a página ou fale connosco.

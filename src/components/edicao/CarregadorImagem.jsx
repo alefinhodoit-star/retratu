@@ -41,7 +41,7 @@ export default function CarregadorImagem({
             </p>
             {imagem.estado === "a_carregar" && (
               <p className="mt-1 flex items-center gap-2 text-[0.8rem] text-muted-foreground">
-                <Loader2 className="h-3.5 w-3.5 animate-spin" /> A carregar…
+                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" /> A carregar…
               </p>
             )}
             {imagem.estado === "erro" && (
@@ -53,19 +53,19 @@ export default function CarregadorImagem({
               type="button"
               variant="ghost"
               size="sm"
-              className="rounded-full"
+              className="h-11 rounded-full sm:h-8"
               onClick={() => inputRef.current?.click()}
             >
-              <RefreshCw className="mr-2 h-4 w-4" /> Substituir
+              <RefreshCw className="mr-2 h-4 w-4" aria-hidden="true" /> Substituir
             </Button>
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="rounded-full text-muted-foreground"
+              className="h-11 rounded-full text-muted-foreground sm:h-8"
               onClick={onRemover}
             >
-              <Trash2 className="mr-2 h-4 w-4" /> Remover
+              <Trash2 className="mr-2 h-4 w-4" aria-hidden="true" /> Remover
             </Button>
           </div>
         </div>

@@ -171,12 +171,12 @@ export default function Legal({ tipo }) {
         className="mt-10 rounded-[1.25rem] border border-border bg-secondary/40 p-6"
       >
         <h2 className="eyebrow">Neste documento</h2>
-        <ol className="mt-4 grid gap-2 text-[0.92rem] sm:grid-cols-2">
+        <ol className="mt-2 grid gap-x-6 text-[0.92rem] sm:grid-cols-2">
           {pagina.secoes.map((secao, indice) => (
             <li key={secao.titulo}>
               <a
                 href={`#secao-${indice + 1}`}
-                className="text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                className="flex min-h-11 items-center text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
               >
                 {secao.titulo}
               </a>

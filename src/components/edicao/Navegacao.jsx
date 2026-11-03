@@ -24,9 +24,9 @@ export default function Navegacao({
             variant="ghost"
             onClick={onAnterior}
             disabled={submetendo}
-            className="rounded-full px-6"
+            className="h-12 rounded-full px-6"
           >
-            <ArrowLeft className="mr-2 h-4 w-4" /> Anterior
+            <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" /> Anterior
           </Button>
         ) : (
           <span />
@@ -39,12 +39,12 @@ export default function Navegacao({
         >
           {submetendo ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> A enviar…
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> A enviar…
             </>
           ) : (
             <>
               {rotuloContinuar}
-              {!enviar && <ArrowRight className="ml-2 h-4 w-4" />}
+              {!enviar && <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />}
             </>
           )}
         </Button>

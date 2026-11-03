@@ -23,8 +23,10 @@ export default function Passos({ atual, onIr }) {
                 onClick={() => onIr(indice)}
                 disabled={indice > atual}
                 aria-current={ativo ? "step" : undefined}
+                /* Em mobile o nome do passo está oculto: sem isto o botão ficava sem nome acessível. */
+                aria-label={nome}
                 className={cn(
-                  "flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.8rem] transition-colors",
+                  "flex min-h-11 items-center gap-2 rounded-full px-3 py-1.5 text-[0.8rem] transition-colors sm:min-h-0",
                   ativo && "bg-foreground text-primary-foreground",
                   concluido && "text-foreground hover:bg-secondary",
                   !ativo && !concluido && "text-muted-foreground"

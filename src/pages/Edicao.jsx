@@ -104,7 +104,17 @@ export default function Edicao() {
       montado.current = true;
       return;
     }
-    topoRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // O html tem `scroll-behavior: smooth`; quando o utilizador pede menos movimento
+    // desativamos temporariamente o smooth para o salto ao topo ser imediato.
+    const reduzirMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const raiz = document.documentElement;
+    const scrollAnterior = raiz.style.scrollBehavior;
+    if (reduzirMovimento) raiz.style.scrollBehavior = "auto";
+    topoRef.current?.scrollIntoView({
+      behavior: reduzirMovimento ? "auto" : "smooth",
+      block: "start",
+    });
+    if (reduzirMovimento) raiz.style.scrollBehavior = scrollAnterior;
   }, [passo]);
 
   const limparErro = (chave) =>
@@ -296,10 +306,10 @@ export default function Edicao() {
         <p className="mt-4 max-w-2xl text-muted-foreground">{SUBTITULOS[passo]}</p>
         <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-[0.82rem] text-muted-foreground">
           <span className="flex items-center gap-2">
-            <Lock className="h-3.5 w-3.5 text-accent" /> Ficheiros privados, eliminados após a entrega
+            <Lock className="h-3.5 w-3.5 text-accent" aria-hidden="true" /> Ficheiros privados, eliminados após a entrega
           </span>
           <span className="flex items-center gap-2">
-            <Clock className="h-3.5 w-3.5 text-accent" /> Pode voltar atrás em qualquer passo
+            <Clock className="h-3.5 w-3.5 text-accent" aria-hidden="true" /> Pode voltar atrás em qualquer passo
           </span>
         </div>
       </header>

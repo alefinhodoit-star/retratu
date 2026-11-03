@@ -44,7 +44,7 @@ export default function ServiceSelector({
               aria-pressed={ativa}
               onClick={() => setCategoriaAtiva(item.id)}
               className={cn(
-                "flex items-center gap-2 rounded-full border px-4 py-2 text-[0.82rem] transition-colors",
+                "flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-[0.82rem] transition-colors",
                 ativa
                   ? "border-foreground bg-secondary text-foreground"
                   : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
@@ -94,7 +94,7 @@ export default function ServiceSelector({
                   onClick={() => onAlternarComplementar(servico.slug)}
                   aria-pressed={complementar}
                   className={cn(
-                    "mt-4 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[0.76rem] transition-colors",
+                    "mt-4 inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 py-1.5 text-[0.76rem] transition-colors sm:min-h-0",
                     complementar
                       ? "border-foreground bg-secondary text-foreground"
                       : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
