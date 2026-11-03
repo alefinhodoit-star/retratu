@@ -1,3 +1,19 @@
+// @ts-check
+
+/**
+ * @typedef {Object} Pacote
+ * @property {string} id
+ * @property {string} nome
+ * @property {string} slug
+ * @property {number} preco preço final com IVA
+ * @property {string} [tag]
+ * @property {string} [descricao]
+ * @property {string[]} inclui
+ * @property {boolean} destaque
+ * @property {number} ordem
+ * @property {boolean} ativo
+ */
+
 /**
  * Catálogo padrão de pacotes de retratos profissionais.
  *
@@ -6,6 +22,7 @@
  * dados, esses passam a ser os apresentados no site — este ficheiro deixa de ser
  * usado. Os preços são finais ao consumidor, com IVA a 23% incluído.
  */
+/** @type {Pacote[]} */
 export const PACOTES_PADRAO = [
   {
     id: "padrao-essencial",
