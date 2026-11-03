@@ -28,10 +28,13 @@ export default function BlogCard({ post, destaque = false }) {
         destaque && "grid md:grid-cols-2"
       )}
     >
+      {/* O título abaixo é o link acessível: a imagem fica fora da ordem de tabulação
+          para não criar três paragens (imagem, título, «Ler artigo») para o mesmo artigo. */}
       <Link
         to={`/blog/${post.slug}`}
         className={cn("block overflow-hidden bg-secondary", destaque ? "md:h-full" : "aspect-[16/10]")}
-        aria-label={post.titulo}
+        aria-hidden="true"
+        tabIndex={-1}
       >
         <Image
           src={coverDoArtigo(post)}
@@ -57,7 +60,12 @@ export default function BlogCard({ post, destaque = false }) {
             destaque ? "text-[1.9rem] sm:text-[2.3rem]" : "text-[1.35rem]"
           )}
         >
-          <Link to={`/blog/${post.slug}`} className="transition-colors hover:text-accent">
+          {/* O dourado (`text-accent`) sobre fundo claro dá ~2,1:1; o hover usa sublinhado
+              com decoração dourada em vez de mudar a cor do texto. */}
+          <Link
+            to={`/blog/${post.slug}`}
+            className="underline-offset-4 decoration-accent decoration-1 hover:underline"
+          >
             {post.titulo}
           </Link>
         </h2>
@@ -70,6 +78,7 @@ export default function BlogCard({ post, destaque = false }) {
 
         <Link
           to={`/blog/${post.slug}`}
+          aria-label={`Ler artigo: ${post.titulo}`}
           className="mt-6 inline-flex min-h-11 items-center gap-2 text-[0.85rem] font-medium underline-offset-4 hover:underline"
         >
           Ler artigo <ArrowRight className="h-4 w-4" aria-hidden="true" />

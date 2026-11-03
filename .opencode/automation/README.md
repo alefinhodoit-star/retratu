@@ -37,7 +37,8 @@ git show --stat <sha>          # ver o que o agente mudou antes de decidir
 
 ```
 .opencode/automation/
-├── run-agent.ps1      # o executor
+├── run-agent.ps1      # o executor (um agente por execução)
+├── run-ciclo.ps1      # corre o executor N vezes seguidas
 ├── state.json         # índice do próximo agente (criado na 1.ª execução)
 ├── prompts/           # um prompt por agente
 │   ├── ui-ux.md
@@ -56,6 +57,9 @@ schtasks /Query /TN "\Retratu\AgentesOpenCode" /V /FO LIST
 # correr agora, sem esperar pelo horário
 schtasks /Run /TN "\Retratu\AgentesOpenCode"
 
+# correr o ciclo completo de uma vez (ui-ux -> perf -> security)
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.opencode\automation\run-ciclo.ps1"
+
 # desativar temporariamente
 schtasks /Change /TN "\Retratu\AgentesOpenCode" /DISABLE
 
@@ -67,6 +71,14 @@ schtasks /Delete /TN "\Retratu\AgentesOpenCode" /F
 
 # testar o script sem correr agente nem build
 powershell -NoProfile -ExecutionPolicy Bypass -File ".\.opencode\automation\run-agent.ps1" -DryRun
+```
+
+`run-ciclo.ps1` respeita a rotação: corre o `run-agent.ps1` N vezes seguidas (3 por omissão).
+Para começar pelo `ui-ux`, o `state.json` tem de ter `"next": 0`. O parâmetro `-Tarefa` reativa a
+tarefa agendada no fim, útil quando o ciclo é lançado à mão com a tarefa suspensa:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.opencode\automation\run-ciclo.ps1" -Vezes 3 -Tarefa "\Retratu\AgentesOpenCode"
 ```
 
 ## Editar o comportamento

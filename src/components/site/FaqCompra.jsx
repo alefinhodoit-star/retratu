@@ -120,7 +120,8 @@ export default function FaqCompra() {
             Envio das fotografias, prazos, entrega, utilização, privacidade e pagamento — explicado de
             forma direta, sem letras pequenas.
           </p>
-          <Button asChild className="mt-9 rounded-full px-7">
+          {/* min-h-11 garante 44 px de alvo de toque: o tamanho `default` do Button é h-9. */}
+          <Button asChild className="mt-9 min-h-11 rounded-full px-7">
             <Link to="/#pacotes">Ver pacotes e preços</Link>
           </Button>
         </div>
@@ -143,7 +144,7 @@ export default function FaqCompra() {
             <p className="max-w-sm text-[0.92rem] text-muted-foreground">
               A sua pergunta não está aqui? Respondemos em menos de um dia útil.
             </p>
-            <Link to="/#contactos" className="link-quiet">
+            <Link to="/#contactos" className="link-quiet min-h-11">
               Falar com a equipa
             </Link>
           </div>

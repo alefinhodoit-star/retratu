@@ -41,7 +41,7 @@ export default function PrivacyPromise() {
               pequenas, como as tratamos do carregamento à eliminação. As suas fotografias não são
               usadas para treinar modelos.
             </p>
-            <Link to="/privacidade" className="link-quiet mt-8">
+            <Link to="/privacidade" className="link-quiet mt-8 min-h-11">
               Ler a Política de Privacidade
             </Link>
             <p className="mt-6 text-[0.88rem] leading-relaxed text-muted-foreground">
