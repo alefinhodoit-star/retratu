@@ -44,6 +44,7 @@ export default function HowItWorks() {
                 src={MEDIA.lente}
                 alt="Objetiva de estúdio com iluminação dourada"
                 fittingType="fill"
+                loading="lazy"
                 className="aspect-[16/9] w-full"
               />
             </div>

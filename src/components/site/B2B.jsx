@@ -74,6 +74,7 @@ export default function B2B() {
                 src={MEDIA.equipa}
                 alt="Conjunto de retratos corporativos de uma equipa portuguesa"
                 fittingType="fill"
+                loading="lazy"
                 className="aspect-[16/9] w-full"
               />
             </div>

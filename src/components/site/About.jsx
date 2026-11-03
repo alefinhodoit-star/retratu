@@ -51,6 +51,7 @@ export default function About() {
               src={MEDIA.lente}
               alt="Objetiva de estúdio usada nas sessões de retrato"
               fittingType="fill"
+              loading="lazy"
               className="aspect-[4/5] w-full"
             />
             <figcaption className="border-t border-border px-5 py-4 text-[0.82rem] leading-relaxed text-muted-foreground">
