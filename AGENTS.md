@@ -12,22 +12,31 @@ O projeto é **independente de plataformas**: não há Base44, Supabase nem qual
 
 ```
 src/lib/api/
-├── index.js      expõe `db` com { auth, entities, integrations }
-└── local/        adaptador atual: localStorage + IndexedDB
+├── index.js      escolhe o adaptador e expõe `db`
+├── http.js       adaptador da API (Node + SQLite)
+└── local/        adaptador offline: localStorage + IndexedDB
+
+server/
+├── index.js      rotas Express 5
+├── db.js         SQLite + schema + seed
+├── auth.js       PBKDF2 + JWT
+└── entities.js   CRUD genérico sobre JSON
 ```
 
-- **Regra**: os componentes importam `db` de `@/lib/api` e nunca chamam `localStorage`/`indexedDB` diretamente.
-- **Contrato**: manter as formas que os componentes já consomem (`{ items }`, `{ rows }`, `{ file_uri }`), para que um adaptador HTTP seja substituível sem tocar nas páginas.
+- **Regra**: os componentes importam `db` de `@/lib/api` e nunca chamam `localStorage`, `indexedDB` ou `fetch` diretamente.
+- **Contrato**: manter as formas que os componentes já consomem (`{ items }`, `{ rows }`, `{ file_uri }`). Os dois adaptadores expõem a mesma interface.
 - **Nunca** introduzir chamadas a serviços externos sem discutir com o utilizador.
 
 ## Key Files
 
 - `src/lib/api/index.js`: ponto único de acesso a dados.
-- `src/lib/api/local/entities.js`: tabelas locais e operações (list, filter, create, update, delete, aggregate, count).
-- `src/lib/api/local/auth.js`: registo, sessão e PBKDF2.
-- `src/lib/pacotes.js`: catálogo de pacotes (semente da tabela `pacotes`).
+- `src/lib/api/http.js`: adaptador da API.
+- `src/lib/api/local/`: adaptador offline (mesma forma).
+- `server/index.js`: rotas e regras de acesso.
+- `server/db.js`: SQLite, schema e seed dos pacotes.
+- `src/lib/pacotes.js`: catálogo de pacotes (semente da base de dados).
 - `src/index.css`: design system — tokens e utilitários (`.section-shell`, `.section-title`, `.link-quiet`, …).
-- `vite.config.js`: Vite com o alias `@` → `src/`.
+- `vite.config.js`: Vite com o alias `@` → `src/` e proxy `/api` → `localhost:3001`.
 
 ## Working Notes
 

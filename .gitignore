@@ -43,3 +43,7 @@ base44/.app.jsonc
 .opencode/automation/backups/
 .opencode/automation/logs/
 .opencode/automation/state.json
+
+# Base de dados e ficheiros do servidor
+data/
+
