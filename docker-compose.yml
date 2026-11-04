@@ -1,0 +1,31 @@
+services:
+  retratu:
+    build: .
+    container_name: retratu
+    restart: unless-stopped
+
+    ports:
+      - "3001:3001"
+
+    environment:
+      PORT: 3001
+      APP_ORIGIN: ${APP_ORIGIN:-https://retratu.pt}
+      # Obrigatório: defina JWT_SECRET no .env (openssl rand -hex 48)
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET no ficheiro .env}
+
+    volumes:
+      # Base de dados, segredo e imagens carregadas.
+      - ./data:/app/data
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3001/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

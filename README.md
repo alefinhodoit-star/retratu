@@ -110,7 +110,14 @@ As palavras-passe são derivadas com **PBKDF2-SHA256** (120 000 iterações, sal
 
 ## Deploy
 
-O build é estático (`dist/`). Pode ser servido por qualquer hosting estático — Netlify, Vercel, Cloudflare Pages, GitHub Pages ou um servidor próprio.
+Corre num servidor próprio com Node 22 ou Docker. O guia completo está em **[DEPLOY.md](./DEPLOY.md)** — inclui Docker Compose, systemd, Caddy, Nginx, DNS e backup.
+
+Resumo:
+
+```bash
+cp .env.example .env     # definir JWT_SECRET
+docker compose up -d --build
+```
 
 O `index.html` já inclui `canonical`, Open Graph e Twitter Card apontados para `https://retratu.pt/`, além de `robots.txt` e `sitemap.xml` em `public/`.
 
