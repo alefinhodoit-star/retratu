@@ -17,7 +17,7 @@ permissions:
 
 - **Stack**: React 18 + Vite, JavaScript (`.jsx`), Tailwind CSS 3.4, Radix UI (`src/components/ui/`), `lucide-react`, `class-variance-authority`, `clsx` + `tailwind-merge` via `cn()` em `@/lib/utils`.
 - **`framer-motion` está instalado** (`^11.16.4`) e pode ser usado — mas CSS nativo é preferível quando resolve o mesmo problema com menos peso.
-- **Backend**: Base44 SDK. Nunca alterar chamadas `db.*`, `db.auth.*` nem a forma dos dados.
+- **Backend**: camada própria em `src/lib/api` (hoje localStorage + IndexedDB). Não alterar as chamadas `db.*` nem a forma dos dados.
 - **Idioma**: todo o texto visível é **português europeu (PT-PT)**. Nunca introduzir inglês na UI.
 - **Design system**: “Lisbon Studio Light” — creme/ink/dourado, Playfair Display (títulos) + Inter (corpo), textura de grão.
   - Tokens de cor em `src/index.css` (`--background`, `--foreground`, `--accent`, `--muted`, `--border`, `--ring`, …). **Usa sempre classes semânticas** (`bg-background`, `text-muted-foreground`, `border-border`, `text-accent`) — nunca `slate-*`, `gray-*`, `zinc-*` nem hex direto em `className`.

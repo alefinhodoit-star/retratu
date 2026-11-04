@@ -1,4 +1,4 @@
-import { db } from "@/api/base44Client";
+import { db } from "@/lib/api";
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
@@ -13,14 +13,17 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [semServico, setSemServico] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await db.auth.resetPasswordRequest(email);
+      const resultado = await db.auth.resetPasswordRequest(email);
+      setSemServico(resultado?.enviado === false);
     } catch {
-      // Always show success regardless
+      // Não revelamos se a conta existe.
+      setSemServico(true);
     } finally {
       setLoading(false);
       setSent(true);
@@ -48,14 +51,30 @@ export default function ForgotPassword() {
       </p>
       {sent ? (
         <div className="text-center">
-          <p className="text-[0.95rem] leading-relaxed text-muted-foreground">
-            Se existir uma conta com{" "}
-            <strong className="font-medium text-foreground">{email}</strong>, receberá o link em
-            poucos minutos. Verifique também a pasta de spam.
-          </p>
-          <p className="mt-4 text-[0.82rem] text-muted-foreground">
-            O link é válido durante 1 hora.
-          </p>
+          {semServico ? (
+            <p className="text-[0.95rem] leading-relaxed text-muted-foreground">
+              O envio de e-mail ainda não está configurado neste ambiente, por isso não é possível
+              enviar o link de recuperação. Contacte-nos em{" "}
+              <a
+                href="mailto:contacto@retratu.pt"
+                className="font-medium text-foreground underline underline-offset-4"
+              >
+                contacto@retratu.pt
+              </a>{" "}
+              e resolvemos o acesso manualmente.
+            </p>
+          ) : (
+            <>
+              <p className="text-[0.95rem] leading-relaxed text-muted-foreground">
+                Se existir uma conta com{" "}
+                <strong className="font-medium text-foreground">{email}</strong>, receberá o link em
+                poucos minutos. Verifique também a pasta de spam.
+              </p>
+              <p className="mt-4 text-[0.82rem] text-muted-foreground">
+                O link é válido durante 1 hora.
+              </p>
+            </>
+          )}
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">

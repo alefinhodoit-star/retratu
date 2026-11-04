@@ -13,7 +13,7 @@ Aplica no máximo UMA correção por execução, com medição antes/depois.
 Restrições:
 
 - Não adiciones dependências e não alteres `package.json`.
-- Não alteres `base44/`.
+- Não alteres `src/lib/api/` (camada de dados).
 - Só alteres `vite.config.js` se tiveres medição que prove ganho real.
 
 Corre `npm run lint`, `npm run typecheck` e `npm run build`; se o build falhar, reverte. Se o orçamento estiver cumprido e não houver regressão, responde "sem alterações" e termina SEM editar.

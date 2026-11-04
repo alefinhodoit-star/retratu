@@ -1,4 +1,4 @@
-import { db } from "@/api/base44Client";
+import { db } from "@/lib/api";
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
@@ -31,7 +31,13 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      await db.auth.register({ email, password });
+      const resultado = await db.auth.register({ email, password });
+      // Em modo local a conta fica com sessão aberta e não há e-mail de
+      // confirmação para esperar; só se houver verificação é que mostramos o OTP.
+      if (resultado?.sessaoIniciada) {
+        window.location.href = safeReturnTo();
+        return;
+      }
       setShowOtp(true);
     } catch (err) {
       setError(err.message || "Não foi possível criar a conta. Tente novamente.");
@@ -69,8 +75,13 @@ export default function Register() {
     }
   };
 
-  const handleGoogle = () => {
-    db.auth.loginWithProvider("google", safeReturnTo());
+  const handleGoogle = async () => {
+    setError("");
+    try {
+      await db.auth.loginWithProvider("google", safeReturnTo());
+    } catch (err) {
+      setError(err.message || "O início de sessão com Google não está disponível.");
+    }
   };
 
   // Marca o campo de confirmação quando o erro apresentado é a divergência entre as palavras-passe.

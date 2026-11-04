@@ -11,6 +11,6 @@ Regras:
 - Nunca imprimas segredos.
 - Não adiciones dependências.
 - Não enfraqueças `safeReturnTo` nem a validação de uploads.
-- Não alteres `src/components/ui/*`, `base44/` nem chamadas `db.*`.
+- Não alteres `src/components/ui/*` nem as chamadas `db.*`.
 
 Corre `npm run lint`, `npm run typecheck` e `npm run build`; se o build falhar, reverte. Se não encontrares nada real, responde "sem alterações" e termina SEM editar.

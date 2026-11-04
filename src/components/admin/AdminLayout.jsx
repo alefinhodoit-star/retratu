@@ -1,4 +1,4 @@
-import { db } from "@/api/base44Client";
+import { db } from "@/lib/api";
 
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { ArrowLeft, Inbox, LayoutDashboard, Mail, Store, Tag } from "lucide-react";

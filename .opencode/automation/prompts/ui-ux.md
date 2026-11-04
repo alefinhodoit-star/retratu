@@ -17,7 +17,7 @@ Corrige apenas problemas verificáveis:
 
 Restrições:
 
-- Não toques em `src/components/ui/*`, `src/index.css` nem `base44/`.
+- Não toques em `src/components/ui/*` nem em `src/index.css`.
 - Não alteres chamadas `db.*`.
 - Não adiciones dependências.
 - Mantém o texto em português europeu.

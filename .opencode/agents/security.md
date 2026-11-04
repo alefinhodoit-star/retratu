@@ -19,8 +19,8 @@ A maior parte do que um scanner “deteta” num frontend React é ruído. Antes
 
 # Contexto do projeto (não assumir outro)
 
-- **Stack**: React 18 + Vite, **JavaScript (`.jsx`/`.js`) — não TypeScript**, `react-router-dom` v6, Tailwind, Radix UI, Base44 SDK.
-- **Backend**: Base44 (entidades + integrações). A autorização real vive no backend, não no React.
+- **Stack**: React 18 + Vite, **JavaScript (`.jsx`/`.js`) — não TypeScript**, `react-router-dom` v6, Tailwind, Radix UI.
+- **Backend**: camada própria em `src/lib/api` (localStorage + IndexedDB). Não há servidor: qualquer "autorização" no cliente é apenas UX.
 - **Idioma**: texto visível em **português europeu (PT-PT)**.
 - **Não é repositório git** — lista os ficheiros antes de editar.
 
@@ -35,10 +35,10 @@ Usa isto como baseline e **reconfirma antes de afirmar o contrário**:
 | `target="_blank"` | **0 ocorrências** (sem risco de reverse tabnabbing por agora) |
 | Open redirect | **Já endurecido** em `src/lib/authReturnTo.js` — valida origem, rejeita `//` e `\`, e remove params sensíveis. **Não enfraquecer.** |
 | Uploads | **Já validados** em `src/lib/edicao/pedidoService.js`: whitelist de MIME, 10 MB, 10000 px, `UploadPrivateFile` (privado). **Não regredir.** |
-| Guard de admin | `src/components/admin/AdminGuard.jsx` é **apenas UX**. A autorização real tem de estar nas regras das entidades Base44. |
+| Guard de admin | `src/components/admin/AdminGuard.jsx` é **apenas UX**. Sem servidor, qualquer pessoa com acesso ao DevTools o contorna. |
 | Zod | **Já instalado** (`zod ^3.24.2`) e usado em `src/lib/edicao/esquema.js`. |
-| Segredos | Só existem `VITE_BASE44_APP_ID`, `VITE_BASE44_APP_BASE_URL` e `VITE_BASE44_FUNCTIONS_VERSION` em `src/lib/app-params.js`. Não há ficheiros `.env` no projeto. |
-| Token de sessão | Guardado em `localStorage` pelo SDK (`base44_access_token`). |
+| Segredos | Não há ficheiros `.env` no projeto nem variáveis `VITE_*` em uso. O frontend não deve conter nenhum segredo. |
+| Token de sessão | Guardado em `localStorage` (`retratu:sessao`), com validade de 30 dias. |
 | Tipagem | `jsconfig.json` tem `allowJs: true` e **`checkJs: false`**. |
 
 # Prioridades
@@ -53,7 +53,7 @@ Usa isto como baseline e **reconfirma antes de afirmar o contrário**:
 ## 2. Segredos e exposição de dados
 
 - Qualquer variável com prefixo `VITE_` é **embutida no bundle e pública**. Verifica que nenhuma contém chave secreta, token de API, credencial Stripe secreta ou service key.
-- Segredos verdadeiros pertencem a funções/backends Base44, nunca ao frontend.
+- Sem servidor não existe onde guardar segredos. Qualquer chave incluída no frontend é pública por definição.
 - Confirma que `.env.local` não é versionado e que não há chaves em `index.html`, `manifest.json` ou comentários.
 - Ao reportar, **nunca** imprimas o valor de um segredo — indica ficheiro e linha, e escreve `[REDACTED]`.
 
@@ -62,18 +62,18 @@ Usa isto como baseline e **reconfirma antes de afirmar o contrário**:
 - `src/components/site/Contact.jsx` e `src/components/site/B2B.jsx` validam apenas com `required` do HTML. **Este é o gap real**: um `POST` direto ignora o browser.
 - Aplica o padrão já existente em `src/lib/edicao/esquema.js`: schema Zod + `safeParse` + erros por campo em PT-PT.
 - Regras mínimas: limites de comprimento (nome ≤ 120, e-mail ≤ 254 e formato válido, mensagem ≤ 2000), `trim`, rejeição de strings vazias após trim, e `email` validado com `z.string().email()`.
-- **Validação de cliente é UX, não segurança.** Diz isso explicitamente no resumo: o backend Base44 tem de revalidar.
+- **Validação de cliente é UX, não segurança.** Diz isso explicitamente no resumo: quando o backend existir, tem de revalidar tudo.
 - Valida também o que vem de `localStorage` (ex.: carrinho em `src/lib/cart.jsx` e o intervalo em `pedidoService.js`): `JSON.parse` de dados manipuláveis pode injetar tipos inesperados. Valida a forma com Zod antes de usar.
 
 ## 4. Autorização
 
-- O `AdminGuard` esconde a UI; **não** protege dados. Verifica as regras das entidades em `base44/entities/*.jsonc` (leitura/escrita por role) e reporta o que estiver permissivo demais.
+- O `AdminGuard` esconde a UI; **não** protege dados. Com os dados no navegador, qualquer pessoa os lê e altera. Reporta isso como risco estrutural, não como bug a corrigir no React.
 - **Não alteres regras de entidades sem confirmação** — podes partir o admin.
 - Verifica que nenhuma página de admin assume que “esconder o link” é suficiente.
 
 ## 5. Headers e configuração
 
-- CSP, `X-Content-Type-Options`, `Referrer-Policy` e `Permissions-Policy` **não podem ser definidos pelo Vite build**. Produz uma **proposta** de cabeçalhos (com valores concretos adequados a este site, incluindo Google Fonts e o domínio da Base44) para configuração no hosting — não inventes ficheiros de config que o projeto não usa.
+- CSP, `X-Content-Type-Options`, `Referrer-Policy` e `Permissions-Policy` **não podem ser definidos pelo Vite build**. Produz uma **proposta** de cabeçalhos (com valores concretos adequados a este site, incluindo Google Fonts) para configuração no hosting — não inventes ficheiros de config que o projeto não usa.
 - Não adiciones middleware nem servidores próprios.
 
 ## 6. Tipagem estrita (adaptada a este projeto)

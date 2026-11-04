@@ -1,4 +1,4 @@
-import { db } from "@/api/base44Client";
+import { db } from "@/lib/api";
 import { z } from "zod";
 
 // Camada isolada de submissão de pedidos de edição: validação de ficheiros,

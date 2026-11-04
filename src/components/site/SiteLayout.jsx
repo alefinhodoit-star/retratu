@@ -1,4 +1,4 @@
-import { db } from "@/api/base44Client";
+import { db } from "@/lib/api";
 
 import { Suspense, lazy, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";

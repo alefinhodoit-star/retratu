@@ -1,4 +1,4 @@
-import { db } from "@/api/base44Client";
+import { db } from "@/lib/api";
 
 import React, { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -32,8 +32,8 @@ export default function ResetPassword() {
     try {
       await db.auth.resetPassword({ resetToken, newPassword });
       window.location.href = "/login";
-    } catch {
-      setError("Não foi possível alterar a palavra-passe. O link pode ter expirado.");
+    } catch (err) {
+      setError(err.message || "Não foi possível alterar a palavra-passe. O link pode ter expirado.");
     } finally {
       setLoading(false);
     }

@@ -15,8 +15,8 @@ permissions:
 
 # Contexto do projeto (não assumir outro)
 
-- **Stack**: React 18 + Vite 8, JavaScript (`.jsx`), `react-router-dom` v6, Tailwind 3.4, Radix UI, Base44 SDK.
-- **Backend**: Base44. Nunca alterar chamadas `db.*` / `db.auth.*` nem a forma dos dados.
+- **Stack**: React 18 + Vite 8, JavaScript (`.jsx`), `react-router-dom` v6, Tailwind 3.4, Radix UI.
+- **Backend**: camada própria em `src/lib/api` (localStorage + IndexedDB). Nunca alterar chamadas `db.*` nem a forma dos dados.
 - **Idioma**: todo o texto visível é **português europeu (PT-PT)**.
 - **Não é um repositório git** — não há `git diff` para delimitar alterações. Lista sempre os ficheiros que vais tocar antes de editar.
 
@@ -63,9 +63,9 @@ Nunca assumir que uma dependência está morta: prova-o com `grep` no `src/` ant
 
 ## 2. `manualChunks` no `vite.config.js`
 
-- Separar `react`/`react-dom`/`react-router-dom` (vendor estável, cacheável) de `@base44/sdk` e de bibliotecas pesadas de admin.
+- Separar `react`/`react-dom`/`react-router-dom` (vendor estável, cacheável) de bibliotecas pesadas de admin.
 - Só adicionar `manualChunks` **depois** de medir o efeito do `lazy` — muitas vezes o `lazy` já resolve e o `manualChunks` só acrescenta complexidade.
-- Nunca quebrar o plugin `@base44/vite-plugin` já configurado.
+- O `vite.config.js` atual declara o alias `@` → `src/`; não o remover nem quebrar.
 
 ## 3. Imagens e LCP/CLS
 

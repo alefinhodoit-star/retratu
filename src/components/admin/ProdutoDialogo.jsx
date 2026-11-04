@@ -1,4 +1,4 @@
-import { db } from "@/api/base44Client";
+import { db } from "@/lib/api";
 
 import { useState } from "react";
 import { Loader2 } from "lucide-react";

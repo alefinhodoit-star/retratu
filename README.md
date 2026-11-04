@@ -1,62 +1,80 @@
-# Base44 Project
+# Retratu
 
-Use this repository to run and edit the app locally, then publish changes back through db.
+Site de retratos profissionais com IA. React 18 + Vite + Tailwind CSS, **sem backend de plataforma** — os dados vivem no navegador através de uma camada própria.
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+## Pré-requisitos
 
-## Prerequisites
+1. Clonar o repositório.
+2. `npm install`
+3. Node 18 ou superior.
 
-1. Clone the repository using the project's Git URL.
-2. Navigate to the project directory.
-3. Install dependencies: `npm install`.
-4. Install the Base44 CLI: `npm install -g base44@latest`.
-5. Install [Deno](https://docs.deno.com/runtime/getting_started/installation/) — the local Base44 backend runs on it.
-
-Run `base44 --help` (or see the [CLI reference](https://docs.db.com/developers/references/cli/commands/introduction)) for the full command surface.
-
-## Run Locally
-
-Three commands, from the project root:
+## Correr localmente
 
 ```bash
-base44 login   # one-time per machine
-base44 link    # one-time per clone
-base44 dev     # local backend + frontend together
+npm run dev
 ```
 
-Open the frontend URL that `base44 dev` prints (typically `http://localhost:5173`).
+Abre em `http://localhost:5173`.
 
-Notes:
+## Scripts
 
-- **Every fresh clone needs `base44 link`.** It writes `base44/.app.jsonc` (the app-id pointer), which is deliberately gitignored. Your app id is in the Builder URL (`app.db.com/apps/<id>/...`); `base44 link --help` shows the non-interactive flags.
-- **`base44 dev` runs the frontend for you** (via `site.serveCommand` in this repo's `base44/config.jsonc`) — never run `npm run dev` yourself: alone it serves a UI with no backend behind it (`[base44] Proxy not enabled`, every `/api` call fails), and alongside `base44 dev` the second Vite silently takes the next port and you end up looking at the wrong one.
-- **The app must be published at least once for the UI to load under `base44 dev`.** The frontend boots by fetching app settings from the hosted app; before the first publish that fails and every page redirects to login. The local API works regardless.
-- Entities, functions, and auth run locally — entity data is **in-memory only**, wiped when `base44 dev` restarts. Everything else (Core integrations, OAuth login) is forwarded to your deployed app. Full breakdown: [Local development overview](https://docs.db.com/developers/backend/overview/local-dev/local-development-overview).
+| Comando | O que faz |
+|---|---|
+| `npm run dev` | servidor de desenvolvimento com HMR |
+| `npm run build` | build de produção para `dist/` |
+| `npm run preview` | serve o build de `dist/` |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | `tsc` sobre `jsconfig.json` (sem `checkJs`) |
 
-## Frontend Only, Hosted Backend
+## Arquitetura
 
-To work on just the frontend against your app's live hosted backend:
-
-```bash
-base44 dev --remote
+```
+src/
+├── components/       componentes de UI (site/, admin/, ui/ primitivos Radix)
+├── pages/            rotas
+├── lib/
+│   ├── api/          ← ponto único de acesso a dados
+│   │   ├── index.js      expõe `db` com auth, entities, integrations
+│   │   └── local/        adaptador atual: localStorage + IndexedDB
+│   ├── pacotes.js    catálogo de pacotes (semente do adaptador)
+│   └── ...
+└── index.css         design system (tokens + utilitários)
 ```
 
-⚠️ In this mode writes go to your app's **production data** — plain `base44 dev` keeps everything local.
+**Regra:** os componentes importam `db` de `@/lib/api` e nunca falam com um backend diretamente. Trocar de backend = substituir `src/lib/api/local/` por um adaptador HTTP com a mesma forma.
 
-## Publish Your Changes
+### O que é guardado onde
 
-After pushing your changes to git, open the Base44 dashboard and publish the app:
+| Dados | Onde |
+|---|---|
+| Pacotes | `localStorage` (`retratu:pacotes`), semeado de `src/lib/pacotes.js` |
+| Utilizadores e sessão | `localStorage` (`retratu:utilizadores`, `retratu:sessao`) |
+| Pedidos, leads, catálogo, blog | `localStorage` |
+| Imagens carregadas | `IndexedDB` (`retratu-ficheiros`) |
 
-```bash
-base44 dashboard open
-```
+As palavras-passe são derivadas com **PBKDF2-SHA256** (120 000 iterações, salt por utilizador). A sessão é um token opaco com validade de 30 dias.
 
-This repo syncs to Base44 through git, so publish from the dashboard rather than `base44 deploy` — a CLI deploy ships your local tree directly, bypassing the sync, and the deployed state silently diverges from the repo.
+### Limitações assumidas (modo local)
 
-## Docs & Support
+- **Sem envio de e-mail** — a recuperação de palavra-passe falha com uma mensagem explícita.
+- **Sem login com Google** — precisa de um servidor OAuth.
+- **Dados por navegador** — não há sincronização entre dispositivos e limpar os dados do site apaga tudo.
+- **Sem admin partilhado** — as contas criadas têm sempre o perfil `user`.
 
-GitHub integration: [https://docs.db.com/developers/app-code/local-development/github](https://docs.db.com/developers/app-code/local-development/github)
+Estas limitações desaparecem quando o backend Node + SQLite entrar: só `src/lib/api/local/` é substituído.
 
-Local development: [https://docs.db.com/developers/backend/overview/local-dev/local-development-overview](https://docs.db.com/developers/backend/overview/local-dev/local-development-overview)
+## Estrutura de conteúdo
 
-Support: [https://app.db.com/support](https://app.db.com/support)
+- **Pacotes**: `src/lib/pacotes.js` (semente; depois editáveis no admin).
+- **Blog**: tabela `blog` no `localStorage` (vazia por omissão).
+- **Loja**: tabelas `loja:categorias` e `loja:produtos`.
+
+## Deploy
+
+O build é estático (`dist/`). Pode ser servido por qualquer hosting estático — Netlify, Vercel, Cloudflare Pages, GitHub Pages ou um servidor próprio.
+
+O `index.html` já inclui `canonical`, Open Graph e Twitter Card apontados para `https://retratu.pt/`, além de `robots.txt` e `sitemap.xml` em `public/`.
+
+## Contactos
+
+`contacto@retratu.pt`

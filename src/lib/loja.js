@@ -1,6 +1,6 @@
 // @ts-check
 
-import { db } from "@/api/base44Client";
+import { db } from "@/lib/api";
 
 import { useEffect, useState } from "react";
 

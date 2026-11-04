@@ -1,4 +1,4 @@
-import { db } from "@/api/base44Client";
+import { db } from "@/lib/api";
 
 import { useRef, useState } from "react";
 import { Image as ImageIcon, Loader2, Upload } from "lucide-react";

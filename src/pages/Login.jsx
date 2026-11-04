@@ -1,4 +1,4 @@
-import { db } from "@/api/base44Client";
+import { db } from "@/lib/api";
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
@@ -34,8 +34,13 @@ export default function Login() {
     }
   };
 
-  const handleGoogle = () => {
-    db.auth.loginWithProvider("google", returnTo);
+  const handleGoogle = async () => {
+    setError("");
+    try {
+      await db.auth.loginWithProvider("google", returnTo);
+    } catch (err) {
+      setError(err.message || "O início de sessão com Google não está disponível.");
+    }
   };
 
   return (
